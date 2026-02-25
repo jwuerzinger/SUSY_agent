@@ -72,7 +72,8 @@ cd ..
 python run_scans.py --phase all --max-workers 10
 
 # 3b. OR let Claude Code continue the full plan (scans + analysis)
-claude --dangerously-skip-permissions
+CLAUDE=/u/jwuerzin/.vscode-server/extensions/anthropic.claude-code-2.1.56-linux-x64/resources/native-binary/claude
+$CLAUDE --dangerously-skip-permissions -p "Continue with the investigation plan..."
 
 # 4. Detach from screen: press Ctrl+A then D
 # 5. Reconnect later:
@@ -89,7 +90,8 @@ cd /scratch/users/jwuerzin/pMSSM/SUSY_agent/Run3ModelGen
 pixi shell
 source build/setup.sh
 cd ..
-claude --dangerously-skip-permissions -p "Continue with the investigation plan in docs/INVESTIGATION_PLAN.md. Run the remaining Phase 1 scans (seeds 137, 256, 999) in parallel, then run the Phase 1 analysis, then run Phase 2 MCMC scans in parallel, then analyse. Use run_scans.py with --max-workers 10 for parallel execution. Document findings as you go."
+CLAUDE=/u/jwuerzin/.vscode-server/extensions/anthropic.claude-code-2.1.56-linux-x64/resources/native-binary/claude
+$CLAUDE --dangerously-skip-permissions -p "Continue with the investigation plan in docs/INVESTIGATION_PLAN.md. Run the remaining Phase 1 scans (seeds 137, 256, 999) in parallel, then run the Phase 1 analysis, then run Phase 2 MCMC scans in parallel, then analyse. Use run_scans.py with --max-workers 10 for parallel execution. Document findings as you go."
 ```
 
 Then detach with `Ctrl+A, D`. Reconnect anytime with `screen -r susy-agent`.
