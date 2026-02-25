@@ -54,10 +54,18 @@ Models are classified into categories based on their phenomenology (see [docs/PH
 - Compressed spectra (small mass splittings)
 - Heavy Higgs accessible
 
-## Status
+## Status (last updated 2026-02-25)
 
 - [x] Project setup and documentation
-- [ ] Framework build
-- [ ] Phase 1: Flat exploration (4 x 500 models)
-- [ ] Phase 2: Targeted MCMC scans (4 x 500 models)
+- [x] Framework build (pixi + cmake, all 6 physics tools + SModelS)
+- [x] Smoke test (5 flat models, verified full pipeline end-to-end)
+- [ ] Phase 1: Flat exploration (4 x 500 models) — **seed42 complete** (40/500 valid), seeds 137/256/999 pending
+- [ ] Phase 1 analysis and documentation
+- [ ] Phase 2: Targeted MCMC scans (4 x 500 models) — configs created (phase2a-d)
 - [ ] Classification and model extraction
+
+### Key findings so far
+- SPheno success rate for flat sampling: ~8% (most random pMSSM points are unphysical)
+- Full pipeline success rate closely tracks SPheno (downstream tools rarely fail)
+- Expected ~160 valid spectra from 2000 flat models, ~20-50 passing all physics cuts
+- MCMC scans (Phase 2) will dramatically improve yield in targeted regions
