@@ -133,19 +133,21 @@ The investigation uses a two-phase approach: broad exploration followed by targe
 - After Higgs mass cut: ~40-50%  of valid spectra → ~65-80
 - After all cuts: ~30-40% of Higgs-passing → ~20-50 models surviving
 
-**Commands:**
+**Commands (parallel execution — 3 remaining seeds run simultaneously on 3 cores):**
 ```bash
 # Enter the pixi environment
 cd Run3ModelGen && pixi shell && source build/setup.sh && cd ..
 
-# Run each seed (sequentially or in parallel on different terminals)
-genModels.py --config_file configs/phase1_flat_config.yaml --scan_dir scans/phase1/scan_seed42 --seed 42
-genModels.py --config_file configs/phase1_flat_config.yaml --scan_dir scans/phase1/scan_seed137 --seed 137
-genModels.py --config_file configs/phase1_flat_config.yaml --scan_dir scans/phase1/scan_seed256 --seed 256
-genModels.py --config_file configs/phase1_flat_config.yaml --scan_dir scans/phase1/scan_seed999 --seed 999
+# Run all remaining Phase 1 seeds in parallel (max 10 workers)
+python run_scans.py --phase 1 --max-workers 10
+
+# Or run individual seeds manually:
+# genModels.py --config_file configs/phase1_flat_config.yaml --scan_dir scans/phase1/scan_seed137 --seed 137
+# genModels.py --config_file configs/phase1_flat_config.yaml --scan_dir scans/phase1/scan_seed256 --seed 256
+# genModels.py --config_file configs/phase1_flat_config.yaml --scan_dir scans/phase1/scan_seed999 --seed 999
 ```
 
-**Runtime:** ~12-15 minutes per scan on this machine.
+**Runtime:** ~12-15 minutes total (3 scans in parallel), vs ~40-45 minutes sequential.
 
 **Analysis:** Run `analysis/analyze_phase1.py` on the merged ntuples. Produces:
 - Pipeline success rate table
@@ -235,14 +237,50 @@ All Phase 2 scans use the same 4 constraints (Higgs mass, relic density, BR(b→
 **Proposal widths:** M_1=25, M_2=25, mu=25 (very tight — the physics lives in the 10-50 GeV mass splitting regime, so we need fine navigation)
 **max_attempts:** 40000 (higher because compressed region is harder to find)
 
-### 4.3 Phase 2 Commands
+### 4.3 Phase 2 Commands (parallel — all 4 MCMC scans run simultaneously on 4 cores)
 ```bash
 cd Run3ModelGen && pixi shell && source build/setup.sh && cd ..
 
-genModels.py --config_file configs/phase2a_ewkino_config.yaml --scan_dir scans/phase2a/scan --seed 42
-genModels.py --config_file configs/phase2b_stop_config.yaml --scan_dir scans/phase2b/scan --seed 42
-genModels.py --config_file configs/phase2c_slepton_config.yaml --scan_dir scans/phase2c/scan --seed 42
-genModels.py --config_file configs/phase2d_compressed_config.yaml --scan_dir scans/phase2d/scan --seed 42
+# Run all Phase 2 MCMC scans in parallel (max 10 workers, uses 4)
+python run_scans.py --phase 2 --max-workers 10
+
+# Or run both phases sequentially (Phase 1 then Phase 2), each phase parallelized:
+python run_scans.py --phase all --max-workers 10
+
+# Or run individual scans manually:
+# genModels.py --config_file configs/phase2a_ewkino_config.yaml --scan_dir scans/phase2a/scan --seed 42
+# genModels.py --config_file configs/phase2b_stop_config.yaml --scan_dir scans/phase2b/scan --seed 42
+# genModels.py --config_file configs/phase2c_slepton_config.yaml --scan_dir scans/phase2c/scan --seed 42
+# genModels.py --config_file configs/phase2d_compressed_config.yaml --scan_dir scans/phase2d/scan --seed 42
+```
+
+### 4.4 Parallel Execution Strategy
+
+Since `genModels.py` processes models sequentially (single-threaded), we parallelise at the **job level** using `run_scans.py`, which spawns up to 10 concurrent subprocesses via Python's `concurrent.futures.ProcessPoolExecutor`.
+
+**Resource allocation (max 10 cores):**
+
+| Phase | Jobs | Cores used | Wall-clock speedup |
+|-------|------|------------|-------------------|
+| Phase 1 (remaining) | 3 flat scans (seeds 137, 256, 999) | 3 | 3× (15 min vs 45 min) |
+| Phase 2 | 4 MCMC scans (2a–2d) | 4 | 4× |
+| Phase all | Phase 1 then Phase 2 | 3 then 4 | Sequential phases, parallel within |
+
+**Key details:**
+- Each `genModels.py` instance is a single-core process; no shared memory or file contention between jobs
+- Each job writes to its own `scan_dir`, so there are no file-locking issues
+- The `--max-workers 10` flag caps concurrency at 10 cores (default)
+- Jobs have a 2-hour timeout as a safety net
+- The runner prints real-time start/finish per job and a summary table at the end
+
+**Script location:** [run_scans.py](../run_scans.py)
+
+```bash
+# Dry run — see what would be executed
+python run_scans.py --phase all --max-workers 10 --dry-run
+
+# Full execution
+python run_scans.py --phase all --max-workers 10
 ```
 
 ---

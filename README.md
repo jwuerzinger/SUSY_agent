@@ -45,6 +45,65 @@ cd ..
 genModels.py --config_file configs/phase1_flat_config.yaml --scan_dir scans/phase1/scan_seed42 --seed 42
 ```
 
+## Running Scans
+
+### Quick start (interactive)
+
+```bash
+cd Run3ModelGen && pixi shell && source build/setup.sh && cd ..
+python run_scans.py --phase all --max-workers 10
+```
+
+### Running via `screen` (recommended for long scans)
+
+Scans take 15+ minutes per phase. Use `screen` so they survive disconnects.
+
+```bash
+# 1. Start a named screen session
+screen -S susy
+
+# 2. Enter the pixi environment and run scans
+cd /scratch/users/jwuerzin/pMSSM/SUSY_agent/Run3ModelGen
+pixi shell
+source build/setup.sh
+cd ..
+
+# 3a. Run scans directly
+python run_scans.py --phase all --max-workers 10
+
+# 3b. OR let Claude Code continue the full plan (scans + analysis)
+claude --dangerously-skip-permissions
+
+# 4. Detach from screen: press Ctrl+A then D
+# 5. Reconnect later:
+screen -r susy
+```
+
+### Running Claude Code autonomously in `screen`
+
+To have Claude Code execute the remaining investigation plan end-to-end:
+
+```bash
+screen -S susy-agent
+cd /scratch/users/jwuerzin/pMSSM/SUSY_agent/Run3ModelGen
+pixi shell
+source build/setup.sh
+cd ..
+claude --dangerously-skip-permissions -p "Continue with the investigation plan in docs/INVESTIGATION_PLAN.md. Run the remaining Phase 1 scans (seeds 137, 256, 999) in parallel, then run the Phase 1 analysis, then run Phase 2 MCMC scans in parallel, then analyse. Use run_scans.py with --max-workers 10 for parallel execution. Document findings as you go."
+```
+
+Then detach with `Ctrl+A, D`. Reconnect anytime with `screen -r susy-agent`.
+
+### Useful screen commands
+
+| Command | Action |
+|---------|--------|
+| `screen -S name` | Start a named session |
+| `Ctrl+A, D` | Detach (leave running) |
+| `screen -r name` | Reattach to session |
+| `screen -ls` | List all sessions |
+| `screen -X -S name quit` | Kill a session |
+
 ## Physics Categories
 
 Models are classified into categories based on their phenomenology (see [docs/PHYSICS_CATEGORIES.md](docs/PHYSICS_CATEGORIES.md)):
