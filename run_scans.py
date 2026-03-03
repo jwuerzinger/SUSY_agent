@@ -47,32 +47,84 @@ PHASE1_JOBS = [
     },
 ]
 
-PHASE2_JOBS = [
+# Phase 2: split each MCMC scan into multiple seeds to fill 10 workers.
+# 3 seeds per scan type × 4 types = 12 jobs, capped to 10 concurrent.
+# Each sub-scan produces 500 models; merging later gives 1500 per type.
+PHASE2_SEEDS = [42, 137, 256]
+
+PHASE2_JOBS = []
+for _seed in PHASE2_SEEDS:
+    PHASE2_JOBS.extend([
+        {
+            "name": f"phase2a_ewkino_s{_seed}",
+            "config": "configs/phase2a_ewkino_config.yaml",
+            "scan_dir": f"scans/phase2a/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase2b_stop_s{_seed}",
+            "config": "configs/phase2b_stop_config.yaml",
+            "scan_dir": f"scans/phase2b/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase2c_slepton_s{_seed}",
+            "config": "configs/phase2c_slepton_config.yaml",
+            "scan_dir": f"scans/phase2c/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase2d_compressed_s{_seed}",
+            "config": "configs/phase2d_compressed_config.yaml",
+            "scan_dir": f"scans/phase2d/scan_seed{_seed}",
+            "seed": _seed,
+        },
+    ])
+
+# Phase 3: Refinement scans targeting specific gaps identified in Phase 2 analysis.
+# 3a: Bino co-annihilation with sleptons
+# 3b: A-funnel resonance (mA ~ 2*m_Bino)
+# 3c: Compressed stop corridor (dm(stop1, LSP) < 200 GeV)
+# Also reruns for failed Phase 2 seeds (phase2c_s314, phase2d_s314)
+PHASE3_SEEDS = [42, 137, 256]
+PHASE2_RERUN_SEED = 314  # Replace failed seed 256 for phase2c and phase2d
+
+PHASE3_JOBS = [
+    # Rerun failed Phase 2 seeds
     {
-        "name": "phase2a_ewkino",
-        "config": "configs/phase2a_ewkino_config.yaml",
-        "scan_dir": "scans/phase2a/scan",
-        "seed": 42,
-    },
-    {
-        "name": "phase2b_stop",
-        "config": "configs/phase2b_stop_config.yaml",
-        "scan_dir": "scans/phase2b/scan",
-        "seed": 42,
-    },
-    {
-        "name": "phase2c_slepton",
+        "name": f"phase2c_slepton_s{PHASE2_RERUN_SEED}",
         "config": "configs/phase2c_slepton_config.yaml",
-        "scan_dir": "scans/phase2c/scan",
-        "seed": 42,
+        "scan_dir": f"scans/phase2c/scan_seed{PHASE2_RERUN_SEED}",
+        "seed": PHASE2_RERUN_SEED,
     },
     {
-        "name": "phase2d_compressed",
+        "name": f"phase2d_compressed_s{PHASE2_RERUN_SEED}",
         "config": "configs/phase2d_compressed_config.yaml",
-        "scan_dir": "scans/phase2d/scan",
-        "seed": 42,
+        "scan_dir": f"scans/phase2d/scan_seed{PHASE2_RERUN_SEED}",
+        "seed": PHASE2_RERUN_SEED,
     },
 ]
+for _seed in PHASE3_SEEDS:
+    PHASE3_JOBS.extend([
+        {
+            "name": f"phase3a_bino_coann_s{_seed}",
+            "config": "configs/phase3a_bino_coannihilation_config.yaml",
+            "scan_dir": f"scans/phase3a/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase3b_afunnel_s{_seed}",
+            "config": "configs/phase3b_afunnel_config.yaml",
+            "scan_dir": f"scans/phase3b/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase3c_comp_stop_s{_seed}",
+            "config": "configs/phase3c_compressed_stop_config.yaml",
+            "scan_dir": f"scans/phase3c/scan_seed{_seed}",
+            "seed": _seed,
+        },
+    ])
 
 # ── Worker function ──────────────────────────────────────────────────────────
 
@@ -158,8 +210,9 @@ def run_jobs_parallel(jobs: list, max_workers: int, project_root: str) -> list:
     Returns:
         List of result dicts
     """
+    MAX_CORES = 10  # hard cap: never exceed 10 workers
     n_jobs = len(jobs)
-    n_workers = min(max_workers, n_jobs)
+    n_workers = min(max_workers, n_jobs, MAX_CORES)
     print(f"\n{'='*60}")
     print(f"Running {n_jobs} scan jobs with {n_workers} parallel workers")
     print(f"{'='*60}\n")
@@ -223,8 +276,8 @@ def main():
     )
     parser.add_argument(
         "--phase",
-        choices=["1", "2", "all"],
-        help="Which phase to run: 1 (flat), 2 (MCMC), or all (1 then 2)",
+        choices=["1", "2", "3", "all"],
+        help="Which phase to run: 1 (flat), 2 (MCMC), 3 (refinement), or all (1 then 2 then 3)",
     )
     parser.add_argument(
         "--jobs",
@@ -263,8 +316,10 @@ def main():
         jobs = PHASE1_JOBS
     elif args.phase == "2":
         jobs = PHASE2_JOBS
+    elif args.phase == "3":
+        jobs = PHASE3_JOBS
     elif args.phase == "all":
-        # Phase 1 first, then Phase 2
+        # Phase 1 first, then Phase 2, then Phase 3
         pass  # handled below
 
     # Verify environment
@@ -282,12 +337,11 @@ def main():
 
     if args.dry_run:
         if args.phase == "all":
-            print("Phase 1 jobs:")
-            for j in PHASE1_JOBS:
-                print(f"  genModels.py --config_file {j['config']} --scan_dir {j['scan_dir']} --seed {j['seed']}")
-            print("\nPhase 2 jobs (after Phase 1 completes):")
-            for j in PHASE2_JOBS:
-                print(f"  genModels.py --config_file {j['config']} --scan_dir {j['scan_dir']} --seed {j['seed']}")
+            for phase_name, phase_jobs in [("Phase 1", PHASE1_JOBS), ("Phase 2", PHASE2_JOBS), ("Phase 3", PHASE3_JOBS)]:
+                print(f"{phase_name} jobs:")
+                for j in phase_jobs:
+                    print(f"  genModels.py --config_file {j['config']} --scan_dir {j['scan_dir']} --seed {j['seed']}")
+                print()
         else:
             for j in jobs:
                 print(f"  genModels.py --config_file {j['config']} --scan_dir {j['scan_dir']} --seed {j['seed']}")
@@ -295,15 +349,14 @@ def main():
         return
 
     if args.phase == "all":
-        print("Phase 1: Flat scans")
-        results1 = run_jobs_parallel(PHASE1_JOBS, args.max_workers, args.project_root)
-
-        n_failed = sum(1 for r in results1 if r["status"] != "SUCCESS")
-        if n_failed > 0:
-            print(f"WARNING: {n_failed} Phase 1 jobs failed. Continuing to Phase 2 anyway.")
-
-        print("\nPhase 2: MCMC scans")
-        results2 = run_jobs_parallel(PHASE2_JOBS, args.max_workers, args.project_root)
+        for phase_name, phase_jobs in [("Phase 1: Flat scans", PHASE1_JOBS),
+                                        ("Phase 2: MCMC scans", PHASE2_JOBS),
+                                        ("Phase 3: Refinement scans", PHASE3_JOBS)]:
+            print(f"\n{phase_name}")
+            results = run_jobs_parallel(phase_jobs, args.max_workers, args.project_root)
+            n_failed = sum(1 for r in results if r["status"] != "SUCCESS")
+            if n_failed > 0:
+                print(f"WARNING: {n_failed} {phase_name} jobs failed. Continuing anyway.")
     else:
         run_jobs_parallel(jobs, args.max_workers, args.project_root)
 

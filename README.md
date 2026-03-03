@@ -15,19 +15,24 @@ This project uses the [Run3ModelGen](Run3ModelGen/) framework to:
 ```
 SUSY_agent/
   Run3ModelGen/          # Submodule: pMSSM model generation framework
-  configs/               # YAML scan configurations (flat, MCMC)
+  configs/               # YAML scan configurations (flat, MCMC, refinement)
   analysis/              # Python analysis scripts
   scans/                 # Scan output directories
-    phase1/              # Flat exploration scans
-    phase2a-d/           # Targeted MCMC scans
+    phase1/              # Flat exploration scans (4 seeds)
+    phase2a-d/           # Targeted MCMC scans (3-4 seeds each)
+    phase3a-c/           # Refinement scans (co-annihilation, A-funnel, compressed stop)
   results/
+    SUMMARY.md           # Full physics summary and conclusions
     plots/               # Generated figures
-    selected_models/     # Extracted SLHA files by category
+    benchmarks/          # Extracted SLHA files (1 per category) + summary CSV
   docs/
+    INVESTIGATION_PLAN.md # Full methodology and execution status
     SCAN_LOG.md          # Running log of all scans
     PHYSICS_CATEGORIES.md # Category definitions and cuts
     NTUPLE_VARIABLES.md  # Full ntuple variable reference
     ANALYSIS_NOTES.md    # Physics observations per phase
+  run_scans.py           # Parallel scan launcher
+  run_ntupling.py        # Post-hoc ntuple generation
 ```
 
 ## Setup
@@ -115,18 +120,31 @@ Models are classified into categories based on their phenomenology (see [docs/PH
 - Compressed spectra (small mass splittings)
 - Heavy Higgs accessible
 
-## Status (last updated 2026-02-25)
+## Status: COMPLETE (2026-03-03)
+
+All scan phases finished. Full results in [results/SUMMARY.md](results/SUMMARY.md).
 
 - [x] Project setup and documentation
 - [x] Framework build (pixi + cmake, all 6 physics tools + SModelS)
-- [x] Smoke test (5 flat models, verified full pipeline end-to-end)
-- [ ] Phase 1: Flat exploration (4 x 500 models) — **seed42 complete** (40/500 valid), seeds 137/256/999 pending
-- [ ] Phase 1 analysis and documentation
-- [ ] Phase 2: Targeted MCMC scans (4 x 500 models) — configs created (phase2a-d)
-- [ ] Classification and model extraction
+- [x] Phase 1: Flat exploration (4 x 500 models) — 5 pass all cuts
+- [x] Phase 2: Targeted MCMC scans (4 types x 3 seeds each) — 451 pass all cuts
+- [x] Phase 3: Refinement scans (A-funnel, co-annihilation, compressed stop) — 2 pass all cuts
+- [x] Final classification with all constraints (including LEP chargino limit)
+- [x] Benchmark SLHA files extracted (9 categories)
 
-### Key findings so far
-- SPheno success rate for flat sampling: ~8% (most random pMSSM points are unphysical)
-- Full pipeline success rate closely tracks SPheno (downstream tools rarely fail)
-- Expected ~160 valid spectra from 2000 flat models, ~20-50 passing all physics cuts
-- MCMC scans (Phase 2) will dramatically improve yield in targeted regions
+### Key Results
+
+| Metric | Value |
+|--------|-------|
+| Total models evaluated | 13,523 |
+| Passing all cuts | **458** |
+| Physics categories populated | 9/9 |
+| LSP composition | 78% Wino, 15% Higgsino, 6% Bino |
+| Models excluded by current LHC limits | ~2% |
+
+### Top Run 3 Search Priorities
+1. **Disappearing tracks** — 359 Wino-compressed models with dm(chi1+, LSP) < 20 GeV
+2. **Slepton pair production** — 259 models with m(slepton) < 600 GeV
+3. **Light stop/sbottom** — 198 stop, 290 sbottom models below 1.2 TeV
+4. **Heavy Higgs ditau** — 60 models with mH/mA < 1 TeV
+5. **Compressed stop** — 7 stealth stop models (dm < 200 GeV)

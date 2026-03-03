@@ -1,0 +1,123 @@
+prior: mcmc
+num_models: 500
+isGMSB: False
+
+# Phase 3a: Bino co-annihilation with sleptons
+# Target: Bino LSP with m(slepton) close to m(Bino) for efficient co-annihilation
+# M_2 and mu large to ensure Bino is the LSP
+
+parameters:
+  tanb: [5, 60]
+  M_1: [100, 600]
+  M_2: [800, 2000]
+  M_3: [2000, 4000]
+  AT: [-8000, 8000]
+  Ab: [-2000, 2000]
+  Atau: [-2000, 2000]
+  mu: [800, 2000]
+  mA: [200, 2000]
+  meL: [100, 700]
+  mtauL: [2000, 2000]
+  meR: [100, 700]
+  mtauR: [2000, 2000]
+  mqL1: [4000, 4000]
+  mqL3: [500, 2000]
+  muR: [4000, 4000]
+  mtR: [500, 2000]
+  mdR: [4000, 4000]
+  mbR: [500, 2000]
+
+mcmc:
+  burn_in: 100
+  max_attempts: 40000
+  accept_invalid: false
+  proposal_widths:
+    tanb: 3.0
+    M_1: 25.0
+    M_2: 100.0
+    M_3: 100.0
+    AT: 400.0
+    Ab: 100.0
+    Atau: 100.0
+    mu: 100.0
+    mA: 100.0
+    meL: 25.0
+    meR: 25.0
+    mqL3: 75.0
+    mtR: 75.0
+    mbR: 75.0
+
+constraints:
+  - name: higgs_mass
+    source:
+      step: SPheno
+      file_type: slha
+      block: MASS
+      entry: 25
+    type: gaussian
+    central: 125.09
+    uncertainty: 3.0
+
+  - name: relic_density
+    source:
+      step: micromegas
+      file_type: csv
+      variable: Omega
+    type: upper_bound
+    central: 0.120
+    uncertainty: 0.012
+
+  - name: bsg_branching
+    source:
+      step: superiso
+      file_type: flha
+      block: FOBS
+      entry: [5, 1]
+    type: gaussian
+    central: 3.32e-4
+    uncertainty: 0.33e-4
+
+  - name: bs_mumu
+    source:
+      step: superiso
+      file_type: flha
+      block: FOBS
+      entry: [531, 1]
+    type: gaussian
+    central: 3.09e-9
+    uncertainty: 0.65e-9
+
+steps:
+  - name: prep_input
+    output_dir: input
+    prefix: IN
+  - name: SPheno
+    input_dir: input
+    output_dir: SPheno
+    log_dir: SPheno_log
+    prefix: SP
+  - name: softsusy
+    input_dir: input
+    output_dir: softsusy
+    prefix: SS
+  - name: micromegas
+    input_dir: SPheno
+    output_dir: micromegas
+    prefix: MO
+  - name: superiso
+    input_dir: SPheno
+    output_dir: superiso
+    prefix: SI
+  - name: gm2calc
+    input_dir: SPheno
+    output_dir: gm2calc
+    prefix: GM2
+  - name: feynhiggs
+    input_dir: SPheno
+    output_dir: feynhiggs
+    log_dir: feynhiggs_log
+    prefix: FH
+  - name: SModelS
+    input_dir: SPheno
+    output_dir: SModelS
+    prefix: SModelS

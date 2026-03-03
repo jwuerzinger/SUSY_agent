@@ -359,36 +359,100 @@ Models surviving all cuts are classified into 9 categories (non-mutually exclusi
 
 ## 7. Execution Status
 
-### Completed
+### Completed (Steps 0-4)
 - [x] Project directory structure and all documentation files
 - [x] Run3ModelGen build (pixi + cmake, SPheno, Softsusy, micrOMEGAs, SuperISO, GM2Calc, FeynHiggs, SModelS all compiled)
+- [x] SUSY_agent pixi environment created with all analysis + scan dependencies (including spheno-atlas)
 - [x] Smoke test (5 flat models, verified full pipeline end-to-end, ntuple with 1131 branches)
-- [x] All scan configs created (phase1 flat + phase2a-d MCMC)
-- [x] Analysis script: analyze_phase1.py
-- [x] Phase 1 scan seed42: **COMPLETE** — 500 models, 40 SPheno successes (8%), ntuple created
+- [x] All scan configs created (phase1 flat + phase2a-d MCMC + phase3a-c refinement)
+- [x] Phase 1: All 4 flat scans complete (seeds 42, 137, 256, 999) — 2000 models, 7 pass all cuts
+- [x] Phase 1 analysis: analyze_phase1.py run, 6 diagnostic plots generated, findings documented
+- [x] Phase 2: All 12 MCMC scans complete (4 types × 3 seeds) — 1740 valid models, 593 pass all cuts
+- [x] Phase 2 analysis: analyze_phase2.py run, 6 plots generated, findings documented
+- [x] Phase 3: 11 refinement scans launched (3a×3 + 3b×3 + 3c×3 + 2 reruns)
+  - Phase 3a (Bino co-annihilation): 0 models — corridor too narrow for MCMC
+  - Phase 3b (A-funnel): 31 models from seed 256, 2 pass all cuts — mechanism confirmed
+  - Phase 3c (Compressed stop): 0 models — over-constrained parameter space
+  - Phase 2c rerun (seed 314): 97 models — successfully replaced failed seed 256
+  - Phase 2d rerun (seed 314): 0 models
+- [x] LEP chargino mass cut applied (m(chi1+) > 103 GeV)
+- [x] Final classification: **458 models pass all cuts** (all phases combined), all 9 categories populated
+- [x] Benchmark models identified per category (updated with LEP cut)
+- [x] All documentation updated (SCAN_LOG.md, ANALYSIS_NOTES.md, INVESTIGATION_PLAN.md)
+- [x] Summary plots generated (results/plots/final_*.png)
 
-### In Progress
-- [ ] Phase 1 scans: seeds 137, 256, 999 (pending execution)
+### Remaining Steps
+- [ ] Extract SLHA benchmark files for each physics category
+- [ ] Write final summary document with physics conclusions and Run 3 search recommendations
+- [ ] Update README.md with complete project results
 
-### Pending
-- [ ] Phase 1 analysis: run analyze_phase1.py on all 4 ntuples, document findings
-- [ ] Phase 2a: Light electroweakino MCMC scan (500 models)
-- [ ] Phase 2b: Light stop/sbottom MCMC scan (500 models)
-- [ ] Phase 2c: Light slepton MCMC scan (500 models)
-- [ ] Phase 2d: Compressed spectra MCMC scan (500 models)
-- [ ] Phase 2 analysis per scan + combined
-- [ ] Final classification and model extraction
-- [ ] Summary document with conclusions
-
-### Key Measurements from Seed42 Scan
-- 500 models generated, 40 passed SPheno (8.0% spectrum convergence rate)
-- 40 passed full pipeline (micrOMEGAs, SuperISO, GM2Calc, FeynHiggs, SModelS)
-- Runtime: ~12 minutes
-- Once SPheno succeeds, downstream tool failure rate is ~0%
+### Key Results Summary
+| Phase | Models generated | Pass all cuts | Notes |
+|-------|-----------------|---------------|-------|
+| Phase 1 (flat) | 2000 | 5 | Baseline (post-LEP cut) |
+| Phase 2a (EWKino) | 602 | 163 | Best yield |
+| Phase 2b (Stop) | 540 | 134 | |
+| Phase 2c (Slepton) | 303 | 71 | Includes seed 314 rerun |
+| Phase 2d (Compressed) | 392 | 83 | |
+| Phase 3a (Bino co-ann) | 0 | 0 | Corridor too narrow |
+| Phase 3b (A-funnel) | 31 | 2 | Mechanism confirmed |
+| Phase 3c (Comp. stop) | 0 | 0 | Over-constrained |
+| **Combined** | **13523 entries** | **458** | **With LEP cut** |
 
 ---
 
-## 8. Documentation Strategy
+## 8. Phase 3: Refinement Scans (Next Steps)
+
+Based on Phase 2 results, several gaps remain in our pMSSM coverage. Phase 3 targets these specific deficiencies.
+
+### 8.1 Motivation
+
+1. **Bino LSP under-representation (4.7%):** Only 28 Bino models survived. Binos need special annihilation mechanisms (co-annihilation with sleptons/stops, A-funnel resonance) to satisfy relic density. These mechanisms require parameter tuning that MCMC can explore.
+
+2. **Compressed stop gap:** Only 5 models with dm(stop1, LSP) < 200 GeV. This is the "stealth stop" corridor — very difficult for conventional LHC searches but potentially accessible via charm-tagging or monojet.
+
+3. **Slepton statistics:** Only 60 slepton models from Phase 2c (and seed 256 essentially failed). Need more statistics for robust coverage.
+
+4. **LEP constraint:** Several benchmark models have m(chi1+) < 103 GeV, which would be excluded by LEP. Adding this cut may remove some models.
+
+### 8.2 Phase 3a: Bino Co-annihilation
+
+**Target:** Bino LSP with m(slepton) or m(stop) ≈ m(Bino) to enable co-annihilation.
+
+**Parameter strategy:**
+- M_1: [-600, 600] — Bino mass
+- meL, meR: [|M_1|, |M_1|+100] — Sleptons close to Bino (co-annihilation)
+- OR mqL3, mtR: [|M_1|, |M_1|+100] — Stops close to Bino
+- M_2, mu: [1000, 3000] — Decouple Wino and Higgsino (force Bino LSP)
+- M_3: [2000, 4000]
+
+### 8.3 Phase 3b: A-funnel
+
+**Target:** Bino LSP with mA ≈ 2 × m(Bino) for resonant s-channel annihilation.
+
+**Parameter strategy:**
+- M_1: [-500, 500]
+- mA: [2×|M_1|−50, 2×|M_1|+50] — Pseudoscalar mass near twice Bino mass
+- tanb: [30, 60] — Large tanb enhances A-Bino-Bino coupling
+- M_2, mu: [1000, 3000] — Decouple non-Bino states
+
+### 8.4 Phase 3c: Compressed Stop Corridor
+
+**Target:** dm(stop1, LSP) in [5, 200] GeV.
+
+**Parameter strategy:**
+- M_1 or M_2: [-500, 500] — LSP mass
+- mqL3, mtR: [|LSP|+5, |LSP|+200] — Stop within 200 GeV of LSP
+- AT: [-6000, 6000] — Large mixing to lower stop1 mass
+- meL, meR: [1000, 2000] — Decouple sleptons
+
+### 8.5 Phase 3d: Rerun Failed Seeds
+
+Rerun phase2c and phase2d with new seeds (e.g., 314, 577) to replace the failed seed 256 runs.
+
+---
+
+## 9. Documentation Strategy
 
 Documentation happens **continuously during execution**, not as a final step. After every action that produces results, findings are recorded before moving on.
 
