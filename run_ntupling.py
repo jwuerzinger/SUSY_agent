@@ -26,6 +26,8 @@ SCAN_CONFIGS = {
     'phase4c': 'configs/phase4c_slepton_bino.yaml',
     'phase4d': 'configs/phase4d_compressed_stop_wino.yaml',
     'phase4e': 'configs/phase4e_mixed_ewkino.yaml',
+    'phase4c_grid': 'configs/phase4c_slepton_bino_grid.yaml',
+    'phase4d_grid': 'configs/phase4d_compressed_stop_grid.yaml',
 }
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -64,8 +66,9 @@ def main():
             continue
 
         # Determine scan type from path
+        # Match longest key first to avoid e.g. 'phase4c' matching 'phase4c_grid'
         phase = None
-        for key in SCAN_CONFIGS:
+        for key in sorted(SCAN_CONFIGS, key=len, reverse=True):
             if key in scan_dir:
                 phase = key
                 break

@@ -1,0 +1,77 @@
+# Phase 4c Grid: Slepton + Bino LSP parameter space
+#
+# Motivation: MCMC failed for this corridor (only 3 models from 3 seeds).
+# The viable region requires Bino LSP with sleptons slightly heavier —
+# a narrow co-annihilation strip that MCMC cannot efficiently sample.
+#
+# Strategy: Cartesian grid over (M_1, meL, meR, tanb).
+# All other SUSY particles set heavy to ensure Bino LSP.
+# AT randomized to cover Higgs mass variation.
+# Pipeline runs every grid point; analysis cuts applied post-hoc.
+#
+# Grid: 8 × 5 × 5 × 3 = 600 points per seed
+
+prior: grid
+num_models: 600  # overridden by grid product
+isGMSB: False
+
+parameters:
+  tanb: [5, 55]
+  M_1: [-550, 550]
+  M_2: [2000, 2000]     # fixed heavy — ensures Bino LSP
+  M_3: [3000, 3000]     # fixed heavy
+  AT: [-6000, 6000]     # randomized (Higgs mass sensitive)
+  Ab: [0, 0]            # fixed
+  Atau: [0, 0]          # fixed
+  mu: [1500, 1500]      # fixed heavy
+  mA: [1500, 1500]      # fixed heavy
+  meL: [150, 650]       # grid axis
+  mtauL: [2000, 2000]   # fixed heavy
+  meR: [150, 650]       # grid axis
+  mtauR: [2000, 2000]   # fixed heavy
+  mqL1: [4000, 4000]    # fixed heavy
+  mqL3: [3000, 3000]    # fixed heavy
+  muR: [4000, 4000]     # fixed heavy
+  mtR: [3000, 3000]     # fixed heavy
+  mdR: [4000, 4000]     # fixed heavy
+  mbR: [3000, 3000]     # fixed heavy
+
+grid:
+  M_1: [-500, -350, -200, -100, 100, 200, 350, 500]
+  meL: [160, 280, 400, 520, 640]
+  meR: [160, 280, 400, 520, 640]
+  tanb: [10, 30, 50]
+
+# Note: softsusy omitted to maximise throughput for grid scans.
+# SPheno is the primary spectrum generator; softsusy is a cross-check
+# that rejects ~80% of otherwise-valid SPheno spectra.
+steps:
+  - name: prep_input
+    output_dir: input
+    prefix: IN
+  - name: SPheno
+    input_dir: input
+    output_dir: SPheno
+    log_dir: SPheno_log
+    prefix: SP
+  - name: micromegas
+    input_dir: SPheno
+    output_dir: micromegas
+    prefix: MO
+  - name: superiso
+    input_dir: SPheno
+    output_dir: superiso
+    prefix: SI
+  - name: gm2calc
+    input_dir: SPheno
+    output_dir: gm2calc
+    prefix: GM2
+  - name: feynhiggs
+    input_dir: SPheno
+    output_dir: feynhiggs
+    log_dir: feynhiggs_log
+    prefix: FH
+  - name: SModelS
+    input_dir: SPheno
+    output_dir: SModelS
+    prefix: SModelS

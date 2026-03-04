@@ -1,6 +1,8 @@
 # SUSY_agent
 
-Systematic investigation of the pMSSM (phenomenological MSSM) parameter space to identify interesting SUSY models as targets for LHC Run 3 searches.
+Systematic investigation of the pMSSM (phenomenological MSSM) parameter space to identify viable SUSY models and gaps in the ATLAS search programme at the LHC.
+
+**[Comprehensive findings document](results/COMPLETE_FINDINGS.md)** — full summary of all results, ATLAS blind spots, Run 3 search proposals, and benchmark spectra.
 
 ## Overview
 
@@ -9,29 +11,37 @@ This project uses the [Run3ModelGen](Run3ModelGen/) framework to:
 2. Evaluate each model through a pipeline of physics tools (SPheno, Softsusy, FeynHiggs, micrOMEGAs, SuperISO, GM2Calc, SModelS)
 3. Apply experimental constraints (Higgs mass, dark matter relic density, B-physics, LHC exclusions)
 4. Classify surviving models into phenomenological categories relevant for LHC searches
+5. Assess ATLAS/CMS coverage using SModelS and identify blind spots with concrete Run 3 search proposals
 
 ## Directory Structure
 
 ```
 SUSY_agent/
   Run3ModelGen/          # Submodule: pMSSM model generation framework
-  configs/               # YAML scan configurations (flat, MCMC, refinement)
-  analysis/              # Python analysis scripts
-  scans/                 # Scan output directories
+  configs/               # YAML scan configurations (flat, MCMC, grid)
+  analysis/              # Python analysis scripts (9 scripts)
+  scans/                 # Scan output directories (48 ntuple files)
     phase1/              # Flat exploration scans (4 seeds)
     phase2a-d/           # Targeted MCMC scans (3-4 seeds each)
     phase3a-c/           # Refinement scans (co-annihilation, A-funnel, compressed stop)
+    phase4a-e/           # ATLAS blind spot targeting (3 seeds each)
+    phase4c_grid/        # Grid scan: slepton + Bino (3 seeds)
+    phase4d_grid/        # Grid scan: compressed stop (3 seeds)
   results/
-    SUMMARY.md           # Full physics summary and conclusions
-    plots/               # Generated figures
-    benchmarks/          # Extracted SLHA files (1 per category) + summary CSV
+    COMPLETE_FINDINGS.md # Comprehensive findings summary (this is the main document)
+    SUMMARY.md           # Physics summary (Phases 1-3)
+    plots/               # Classification and summary figures (15 PNGs)
+    benchmarks/          # Category benchmark SLHA files (9) + summary CSV
+    atlas_coverage/      # SModelS coverage analysis (2 CSVs, 2 reports, 8 plots)
+    atlas_proposals/     # Run 3 search proposals (2 reports, 35 benchmarks, 23 plots)
   docs/
     INVESTIGATION_PLAN.md # Full methodology and execution status
-    SCAN_LOG.md          # Running log of all scans
+    FOLLOWUP_PLAN.md     # Follow-up work priorities and lessons learned
+    SCAN_LOG.md          # Complete log of all scans
+    ANALYSIS_NOTES.md    # Detailed physics observations per phase
     PHYSICS_CATEGORIES.md # Category definitions and cuts
     NTUPLE_VARIABLES.md  # Full ntuple variable reference
-    ANALYSIS_NOTES.md    # Physics observations per phase
-  run_scans.py           # Parallel scan launcher
+  run_scans.py           # Parallel scan launcher (flat, MCMC, grid)
   run_ntupling.py        # Post-hoc ntuple generation
 ```
 
@@ -120,31 +130,45 @@ Models are classified into categories based on their phenomenology (see [docs/PH
 - Compressed spectra (small mass splittings)
 - Heavy Higgs accessible
 
-## Status: COMPLETE (2026-03-03)
+## Status: COMPLETE (2026-03-04)
 
-All scan phases finished. Full results in [results/SUMMARY.md](results/SUMMARY.md).
+All scan phases and ATLAS blind spot analysis finished. See **[results/COMPLETE_FINDINGS.md](results/COMPLETE_FINDINGS.md)** for the full findings.
 
 - [x] Project setup and documentation
 - [x] Framework build (pixi + cmake, all 6 physics tools + SModelS)
 - [x] Phase 1: Flat exploration (4 x 500 models) — 5 pass all cuts
-- [x] Phase 2: Targeted MCMC scans (4 types x 3 seeds each) — 451 pass all cuts
+- [x] Phase 2: Targeted MCMC scans (4 types x 3-4 seeds each) — 451 pass all cuts
 - [x] Phase 3: Refinement scans (A-funnel, co-annihilation, compressed stop) — 2 pass all cuts
+- [x] Phase 4: ATLAS blind spot targeting (5 types x 3 seeds) — 1,605 new passing models
+- [x] Phase 4 grid scans for narrow corridors — 0 new models (physics constraints too tight)
 - [x] Final classification with all constraints (including LEP chargino limit)
-- [x] Benchmark SLHA files extracted (9 categories)
+- [x] Benchmark SLHA files extracted (9 categories + 35 gap-specific + 30 mass-grid)
+- [x] ATLAS coverage assessment (SModelS reinterpretation)
+- [x] Five ATLAS blind spots identified and characterised
+- [x] Run 3 search proposals with signal regions, yield estimates, and benchmarks
+- [x] Direct detection complementarity analysis
 
 ### Key Results
 
 | Metric | Value |
 |--------|-------|
-| Total models evaluated | 13,523 |
-| Passing all cuts | **458** |
+| Total models evaluated | 24,188 |
+| Passing all cuts | **2,063** |
 | Physics categories populated | 9/9 |
-| LSP composition | 78% Wino, 15% Higgsino, 6% Bino |
+| LSP composition | 49% Wino, 48% Higgsino, 3% Bino |
+| Invisible to ATLAS (SModelS tier 0) | **66.5%** |
+| ATLAS blind spots identified | 5 |
+| Truly dark models (LHC + DD invisible) | 3 |
 | Models excluded by current LHC limits | ~2% |
 
-### Top Run 3 Search Priorities
-1. **Disappearing tracks** — 359 Wino-compressed models with dm(chi1+, LSP) < 20 GeV
-2. **Slepton pair production** — 259 models with m(slepton) < 600 GeV
-3. **Light stop/sbottom** — 198 stop, 290 sbottom models below 1.2 TeV
-4. **Heavy Higgs ditau** — 60 models with mH/mA < 1 TeV
-5. **Compressed stop** — 7 stealth stop models (dm < 200 GeV)
+### ATLAS Blind Spots and Run 3 Search Priorities
+
+| Gap | Description | Models | Priority | Proposed search |
+|-----|-------------|:------:|----------|-----------------|
+| A | Compressed Wino | 526 | HIGH | Disappearing tracks (pixel tracklets) |
+| B | Compressed Higgsino | 737 | HIGH | ISR + soft dileptons (mll binning) |
+| C | Light sleptons | 497 | MEDIUM | Extended dilepton + MET (mT2) |
+| D | Compressed stop | 2 | MEDIUM | Novel displaced vertex + b-jet |
+| E | Complex EWKino | 80 | LOW | Multi-lepton cascades |
+
+Full signal region definitions, yield estimates, and benchmark SLHA files in [results/atlas_proposals/RUN3_SEARCH_PROPOSALS.md](results/atlas_proposals/RUN3_SEARCH_PROPOSALS.md).

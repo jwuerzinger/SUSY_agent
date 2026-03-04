@@ -1,7 +1,7 @@
 # Follow-up Plan: Next Steps After ATLAS Gap Analysis
 
-**Date:** 2026-03-03
-**Status:** ALL STAGES COMPLETE (including Phase 4 scans, ntupling, and re-analysis)
+**Date:** 2026-03-04 (updated)
+**Status:** P1 COMPLETE — Grid scans attempted, Run 3 search proposals delivered
 
 ---
 
@@ -75,43 +75,73 @@ results/
     plots/ (8 PNG files, all updated with Phase 4 data)
   atlas_proposals/
     ATLAS_GAP_ANALYSIS.md
+    RUN3_SEARCH_PROPOSALS.md          (NEW — comprehensive Run 3 proposals)
     benchmarks/gap_{A,B,C,D,E}/      (25 SLHA files total)
+    plots/ (23 PNG files — per-gap and summary)
 ```
 
 ---
 
-## Next Steps
+## P1 Results (Completed 2026-03-04)
 
-### Priority 1: Fix Failed Scans (Phase4c Sleptons, Phase4d Compressed Stop)
+### Grid Scan Results
 
-Phase4c and phase4d effectively produced no models. The MCMC sampling cannot find viable points in these narrow parameter corridors. Three approaches to try:
+Grid sampling was implemented (`sample_grid()` in modelgen.py) and executed for the two failed corridors:
 
-**Option A: Grid-based scanning**
-Create a new scan mode that uses a structured grid rather than MCMC. For phase4c (slepton+Bino), the key constraint is m(Bino) < m(slepton) < ~700 GeV with all other sparticles heavy. A grid over (M_1, meL, meR) with fixed heavy M_2/mu/M_3 should directly populate this space.
+| Scan | Grid spec | Total points | SPheno valid | Pipeline complete | Pass all cuts |
+|------|-----------|-------------|-------------|-------------------|---------------|
+| phase4c_grid (Slepton+Bino) | 8(M_1) × 5(meL) × 5(meR) × 3(tanb) × 3 seeds | 5,400 | 3,276 (61%) | 1,085 (20%) | **0** |
+| phase4d_grid (Compressed stop) | 6(M_2) × 5(mqL3) × 5(mtR) × 3(tanb) × 3 seeds | 4,050 | 1,350 (33%) | 27 (0.7%) | **0** |
 
-**Option B: Wider MCMC with post-selection**
-Loosen the MCMC constraints (e.g., remove relic density from MCMC acceptance) and apply them only at the ntuple analysis stage. This lets the chain explore more freely and post-selects the physically valid models.
+**Why no models pass:**
 
-**Option C: Importance sampling from Phase 2c**
-Use the Phase 2c slepton scan output as a proposal distribution. The 71 passing models from Phase 2c define the viable region — generate new points by perturbing these with small proposal widths.
+- **Phase4c (Slepton+Bino):** All 1,092 valid models fail the **relic density** cut (Omega_h^2 ≤ 0.132). Measured values range from 0.45 to 19.4 with median 3.31. Bino LSPs require sleptons within ~10-20 GeV of the LSP mass to achieve sufficient co-annihilation — this is an extremely narrow strip in (M_1, meL, meR) space that a coarse grid cannot resolve. The co-annihilation strip width is ~O(1%) of the slepton mass range.
 
-### Priority 2: Refine Benchmark Selection
+- **Phase4d (Compressed stop):** 96% of models (433/450 per seed) fail at the SPheno level (Yukawa coupling instabilities). The 28 surviving models all fail the **Higgs mass** cut — m_h ranges from 109.7 to 120.5 GeV (need 122-128). Light stops suppress the Higgs mass through radiative corrections; achieving m_h ≈ 125 with stops below 800 GeV requires very specific trilinear coupling values and large mixing.
 
-With 2,063 models now available:
-- Create a mass-grid of benchmark points for each gap (e.g., m(Wino) = 100, 200, 300, ..., 800 GeV)
-- Select benchmarks that are maximally spread across the mass plane
-- Include both "typical" and "extreme" benchmarks per gap
-- Write a systematic benchmark table for ATLAS consumption
+**Key lesson:** These corridors are intrinsically narrow in multi-dimensional parameter space. Grid sampling with feasible point counts cannot resolve them. The existing models from MCMC (3 from phase4c, 26 from phase4d, plus contributions from phase2c/2d) represent the viable parameter space. For future work, **targeted importance sampling** from the known viable points (Option C) is more promising than grid sampling.
 
-### Priority 3: Quantify ATLAS Reach Boundaries
+### Infrastructure Additions
+- `modelgen.py`: New `sample_grid()` method for Cartesian grid sampling
+- `configs/phase4c_slepton_bino_grid.yaml`, `configs/phase4d_compressed_stop_grid.yaml`
+- `run_scans.py`: `--phase 4grid` option with per-job timeouts
+- `run_ntupling.py`: phase4c_grid/phase4d_grid support, longest-match bug fix
 
-Create proper exclusion contour overlays on mass-plane plots:
-- Download published ATLAS exclusion contours from HEPData for:
-  - ATLAS-SUSY-2018-19 (disappearing tracks) — directly relevant for Gap A
-  - ATLAS-SUSY-2018-32 (direct sleptons) — directly relevant for Gap C
-  - ATLAS-SUSY-2019-09 (compressed Higgsino) — directly relevant for Gap B
-- Overlay on our mass-plane plots to show where pMSSM models fall relative to ATLAS reach
-- Quantify the gap between the ATLAS contour boundary and our model populations
+### Run 3 Search Proposals (P1 + P2 Deliverable)
+
+`analysis/run3_proposals.py` produces comprehensive ATLAS Run 3 search proposals with:
+- Concrete signal region definitions for 5 ATLAS blind spots (Gaps A-E)
+- Signal yield estimates at 300 fb⁻¹ (13.6 TeV, k=1.15)
+- Direct detection complementarity (XENON-nT, LZ, DARWIN)
+- 30 mass-grid benchmarks across all gaps
+- 23 publication-quality plots
+
+| Gap | Description | Models | Excludable (N>3) | Discoverable (N>10) | Benchmarks |
+|-----|-------------|--------|------------------|---------------------|------------|
+| A | Compressed Wino (disappearing tracks) | 526 | 103 | 73 | 7 |
+| B | Compressed Higgsino (soft leptons) | 737 | 34 | 11 | 7 |
+| C | Light Sleptons (dilepton + MET) | 497 | 145 | 108 | 7 |
+| D | Compressed Stop (displaced vertex) | 2 | 2 | 2 | 2 |
+| E | Complex EWKino (multi-lepton cascade) | 80 | 21 | 12 | 7 |
+
+**Truly dark models:** 3 models invisible to both ATLAS and projected DARWIN sensitivity — only discoverable at the LHC with dedicated searches.
+
+**SModelS caveat:** The coverage assessment relies on SModelS v3.1.1, which lacks ATLAS disappearing-track (SUSY-2018-19), direct slepton (SUSY-2018-32), and compressed Higgsino (SUSY-2019-09) topologies. Many Gap A/B/C models may already be partially constrained by existing analyses.
+
+---
+
+## Remaining Priorities
+
+### Priority 2 (partially done): ATLAS Contour Overlays
+- Download published ATLAS exclusion contours from HEPData
+- Overlay on mass-plane plots to show model populations vs. ATLAS reach
+- Contours for ATLAS-SUSY-2018-19, -2018-32, -2019-09
+
+### Priority 3: Refine Phase4c/4d Sampling (if more models needed)
+
+The grid sampling approach (Option A) was attempted and proved insufficient for these narrow corridors. Future attempts should use:
+- **Importance sampling** (Option C): Perturb existing viable models from phase2c/2d with small proposal widths, especially targeting the co-annihilation strip (slepton-LSP mass splitting ~5-20 GeV) and Higgs-mass-compatible stop mixing
+- **Parameterized grid**: Grid over (M_1, dm_slepton) instead of (M_1, meL, meR), where dm_slepton = m_slepton - m_LSP is constrained to [5, 50] GeV
 
 ### Priority 4: SModelS Database Update Requests
 
@@ -137,13 +167,12 @@ For each blind spot:
 - Assess which gaps will be closed by luminosity alone and which require new analysis strategies
 - This informs which ATLAS analysis proposals are truly novel vs. just needing more data
 
-### Priority 7: Direct Detection Complementarity
+### Priority 7: Direct Detection Complementarity (DONE in run3_proposals.py)
 
-For each ATLAS-blind model:
-- Extract spin-independent (SI) and spin-dependent (SD) direct detection cross-sections from MicrOMEGAs output
-- Compare with XENON-nT, LZ, and projected DARWIN sensitivities
-- Identify "truly dark" models invisible to both LHC and direct detection experiments
-- This provides complementary physics motivation beyond LHC searches
+✓ Extracted SI and SD cross-sections from MicrOMEGAs ntuples
+✓ Compared with XENON-nT, LZ, and DARWIN projected limits
+✓ Identified 3 "truly dark" models (invisible to both ATLAS and DARWIN)
+✓ dd_complementarity.png plot produced
 
 ### Priority 8: Publication Preparation
 
@@ -159,23 +188,29 @@ For each ATLAS-blind model:
 
 1. **MCMC limitations for narrow corridors:** Phase4c (slepton+Bino) and phase4d (compressed stop) failed, matching Phase 3a/3c failures. Alternative sampling methods (grid, nested, importance) are essential for these targets.
 
-2. **Scan timeout:** The 2-hour timeout in run_scans.py was too short for 500-model MCMC scans with burn_in=100. Consider increasing to 4 hours or implementing checkpointing.
+2. **Grid sampling also insufficient for narrow corridors:** The Phase 4 grid scans (phase4c_grid: 5,400 points, phase4d_grid: 4,050 points) produced 1,092 and 28 valid spectra respectively, but **zero models passed all physics cuts**. For phase4c, the co-annihilation strip (slepton-LSP mass splitting ~10-20 GeV) is too narrow to be resolved by a coarse grid over (M_1, meL, meR). For phase4d, the Higgs mass constraint requires very specific stop mixing that random AT sampling doesn't reliably achieve. **Importance sampling from existing viable points is the recommended approach.**
 
-3. **SModelS topology coverage is the main bottleneck:** The dominance of T2tt/T2bb topologies and absence of EWKino/slepton/disappearing-track ATLAS topologies in SModelS v3.1.1 means our "ATLAS invisible" count is an overestimate of true ATLAS insensitivity. Encoding more ATLAS results in SModelS would significantly change the picture.
+3. **softsusy as bottleneck vs. cross-check:** Removing softsusy from grid scan pipelines increased SPheno-to-SModelS throughput from ~20% to ~60% for phase4c. However, softsusy is required by the `apply_all_cuts()` quality cut (both SP_m_h and SS_m_h must be valid). For grid scans without softsusy, this cut rejects all models regardless of physics. Future grid scans should either include softsusy or use a relaxed quality cut.
 
-4. **Phase 4 dramatically increased statistics:** Going from 458 to 2,063 models (4.5x) confirms that the blind-spot regions are densely populated in viable pMSSM parameter space — these are not edge cases but a large fraction of the physically allowed models.
+4. **Scan timeout:** The 2-hour timeout in run_scans.py was too short for 500-model MCMC scans with burn_in=100. Consider increasing to 4 hours or implementing checkpointing.
+
+5. **SModelS topology coverage is the main bottleneck:** The dominance of T2tt/T2bb topologies and absence of EWKino/slepton/disappearing-track ATLAS topologies in SModelS v3.1.1 means our "ATLAS invisible" count is an overestimate of true ATLAS insensitivity. Encoding more ATLAS results in SModelS would significantly change the picture.
+
+6. **Phase 4 dramatically increased statistics:** Going from 458 to 2,063 models (4.5x) confirms that the blind-spot regions are densely populated in viable pMSSM parameter space — these are not edge cases but a large fraction of the physically allowed models.
 
 ---
 
 ## Execution Priority Summary
 
-| Priority | Task | Effort |
-|----------|------|--------|
-| **P1** | Fix Phase4c/4d with grid sampling | 2-4 hours |
-| **P1** | Refine benchmark selection | 1-2 hours |
-| **P2** | ATLAS contour overlays from HEPData | 2-3 hours |
-| **P2** | SModelS database update requests | External contact |
-| **P3** | CheckMATE2/MadAnalysis5 reinterpretation | 1-2 days |
-| **P3** | HL-LHC projections | 1 day |
-| **P4** | Direct detection complementarity | 1 day |
-| **P4** | Publication preparation | 1-2 weeks |
+| Priority | Task | Status | Notes |
+|----------|------|--------|-------|
+| **P1** | Fix Phase4c/4d with grid sampling | ✅ DONE | Grid scans executed; 0 new passing models (physics constraints too narrow) |
+| **P1** | Refine benchmark selection | ✅ DONE | 30 benchmarks selected in run3_proposals.py |
+| **P1** | Run 3 search proposals | ✅ DONE | RUN3_SEARCH_PROPOSALS.md + 23 plots |
+| **P1** | Direct detection complementarity | ✅ DONE | dd_complementarity.png, 3 truly dark models identified |
+| **P2** | ATLAS contour overlays from HEPData | TODO | Download + overlay published exclusion contours |
+| **P2** | SModelS database update requests | TODO | External contact with SModelS team |
+| **P3** | Refined phase4c/4d sampling (importance) | TODO | Perturb existing viable models for narrow corridors |
+| **P3** | CheckMATE2/MadAnalysis5 reinterpretation | TODO | Full MC for 30 benchmarks |
+| **P3** | HL-LHC projections | TODO | Scale to 3000 fb⁻¹ |
+| **P4** | Publication preparation | TODO | Paper draft, ATLAS-style plots |

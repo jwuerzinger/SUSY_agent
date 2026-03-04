@@ -165,6 +165,30 @@ for _seed in PHASE4_SEEDS:
         },
     ])
 
+# Phase 4 Grid: Grid-based rescans for corridors where MCMC failed.
+# phase4c_grid: slepton+Bino (600 grid points per seed)
+# phase4d_grid: compressed stop+Wino (450 grid points per seed)
+PHASE4_GRID_SEEDS = [42, 137, 256]
+
+PHASE4_GRID_JOBS = []
+for _seed in PHASE4_GRID_SEEDS:
+    PHASE4_GRID_JOBS.extend([
+        {
+            "name": f"phase4c_grid_s{_seed}",
+            "config": "configs/phase4c_slepton_bino_grid.yaml",
+            "scan_dir": f"scans/phase4c_grid/scan_seed{_seed}",
+            "seed": _seed,
+            "timeout": 14400,  # 4 hours for grid scans
+        },
+        {
+            "name": f"phase4d_grid_s{_seed}",
+            "config": "configs/phase4d_compressed_stop_grid.yaml",
+            "scan_dir": f"scans/phase4d_grid/scan_seed{_seed}",
+            "seed": _seed,
+            "timeout": 14400,  # 4 hours for grid scans
+        },
+    ])
+
 # ── Worker function ──────────────────────────────────────────────────────────
 
 
@@ -188,13 +212,15 @@ def run_scan(job: dict, project_root: str) -> dict:
     print(f"[START] {job['name']}: {' '.join(cmd)}")
     t0 = time.time()
 
+    job_timeout = job.get("timeout", 7200)  # default 2h, grid scans use 4h
+
     try:
         result = subprocess.run(
             cmd,
             cwd=project_root,
             capture_output=True,
             text=True,
-            timeout=7200,  # 2 hour timeout per scan
+            timeout=job_timeout,
         )
         elapsed = time.time() - t0
         status = "SUCCESS" if result.returncode == 0 else "FAILED"
@@ -216,7 +242,7 @@ def run_scan(job: dict, project_root: str) -> dict:
 
     except subprocess.TimeoutExpired:
         elapsed = time.time() - t0
-        print(f"[TIMEOUT] {job['name']}: exceeded 2h limit after {elapsed:.1f}s")
+        print(f"[TIMEOUT] {job['name']}: exceeded {job_timeout}s limit after {elapsed:.1f}s")
         return {
             "name": job["name"],
             "returncode": -1,
@@ -315,8 +341,8 @@ def main():
     )
     parser.add_argument(
         "--phase",
-        choices=["1", "2", "3", "4", "all"],
-        help="Which phase to run: 1 (flat), 2 (MCMC), 3 (refinement), 4 (blind-spot), or all",
+        choices=["1", "2", "3", "4", "4grid", "all"],
+        help="Which phase to run: 1 (flat), 2 (MCMC), 3 (refinement), 4 (blind-spot), 4grid (grid rescans), or all",
     )
     parser.add_argument(
         "--jobs",
@@ -359,6 +385,8 @@ def main():
         jobs = PHASE3_JOBS
     elif args.phase == "4":
         jobs = PHASE4_JOBS
+    elif args.phase == "4grid":
+        jobs = PHASE4_GRID_JOBS
     elif args.phase == "all":
         # Phase 1 first, then Phase 2, then Phase 3, then Phase 4
         pass  # handled below
@@ -378,7 +406,7 @@ def main():
 
     if args.dry_run:
         if args.phase == "all":
-            for phase_name, phase_jobs in [("Phase 1", PHASE1_JOBS), ("Phase 2", PHASE2_JOBS), ("Phase 3", PHASE3_JOBS), ("Phase 4", PHASE4_JOBS)]:
+            for phase_name, phase_jobs in [("Phase 1", PHASE1_JOBS), ("Phase 2", PHASE2_JOBS), ("Phase 3", PHASE3_JOBS), ("Phase 4", PHASE4_JOBS), ("Phase 4 Grid", PHASE4_GRID_JOBS)]:
                 print(f"{phase_name} jobs:")
                 for j in phase_jobs:
                     print(f"  genModels.py --config_file {j['config']} --scan_dir {j['scan_dir']} --seed {j['seed']}")
@@ -393,7 +421,8 @@ def main():
         for phase_name, phase_jobs in [("Phase 1: Flat scans", PHASE1_JOBS),
                                         ("Phase 2: MCMC scans", PHASE2_JOBS),
                                         ("Phase 3: Refinement scans", PHASE3_JOBS),
-                                        ("Phase 4: Blind-spot scans", PHASE4_JOBS)]:
+                                        ("Phase 4: Blind-spot scans", PHASE4_JOBS),
+                                        ("Phase 4 Grid: Grid rescans", PHASE4_GRID_JOBS)]:
             print(f"\n{phase_name}")
             results = run_jobs_parallel(phase_jobs, args.max_workers, args.project_root)
             n_failed = sum(1 for r in results if r["status"] != "SUCCESS")
