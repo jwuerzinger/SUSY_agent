@@ -21,6 +21,11 @@ SCAN_CONFIGS = {
     'phase3a': 'configs/phase3a_bino_coannihilation_config.yaml',
     'phase3b': 'configs/phase3b_afunnel_config.yaml',
     'phase3c': 'configs/phase3c_compressed_stop_config.yaml',
+    'phase4a': 'configs/phase4a_wino_mapping.yaml',
+    'phase4b': 'configs/phase4b_higgsino_soft.yaml',
+    'phase4c': 'configs/phase4c_slepton_bino.yaml',
+    'phase4d': 'configs/phase4d_compressed_stop_wino.yaml',
+    'phase4e': 'configs/phase4e_mixed_ewkino.yaml',
 }
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))

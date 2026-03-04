@@ -1,0 +1,14 @@
+# SUSY Les Houches Accord 2 - MSSM spectrum + Decays
+# SPheno v4.0.6  
+# W. Porod, Comput. Phys. Commun. 153 (2003) 275-315, hep-ph/0301101;
+# W. Porod, F.~Staub, Comput. Phys. Commun. 183 (2012) 2458
+#                     arXiv:1104.1573 [hep-ph] 
+# in case of problems send email to porod@physik.uni-wuerzburg.de
+# Created: 25.02.2026,  20:04
+Block SPINFO         # Program information
+     1   SPheno      # spectrum calculator
+     2   v4.0.6      # version number
+     4               # internal problem, see Messages.out for infos
+#
+Block SPhenoINFO     # SPheno specific information
+    1      2         # using 2-loop RGEs

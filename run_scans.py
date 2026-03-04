@@ -126,6 +126,45 @@ for _seed in PHASE3_SEEDS:
         },
     ])
 
+# Phase 4: Targeted blind-spot scans to densely populate ATLAS gaps.
+# 5 scan types × 3 seeds = 15 jobs.
+PHASE4_SEEDS = [42, 137, 256]
+
+PHASE4_JOBS = []
+for _seed in PHASE4_SEEDS:
+    PHASE4_JOBS.extend([
+        {
+            "name": f"phase4a_wino_s{_seed}",
+            "config": "configs/phase4a_wino_mapping.yaml",
+            "scan_dir": f"scans/phase4a/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase4b_higgsino_s{_seed}",
+            "config": "configs/phase4b_higgsino_soft.yaml",
+            "scan_dir": f"scans/phase4b/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase4c_slepton_s{_seed}",
+            "config": "configs/phase4c_slepton_bino.yaml",
+            "scan_dir": f"scans/phase4c/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase4d_comp_stop_s{_seed}",
+            "config": "configs/phase4d_compressed_stop_wino.yaml",
+            "scan_dir": f"scans/phase4d/scan_seed{_seed}",
+            "seed": _seed,
+        },
+        {
+            "name": f"phase4e_mixed_ewk_s{_seed}",
+            "config": "configs/phase4e_mixed_ewkino.yaml",
+            "scan_dir": f"scans/phase4e/scan_seed{_seed}",
+            "seed": _seed,
+        },
+    ])
+
 # ── Worker function ──────────────────────────────────────────────────────────
 
 
@@ -276,8 +315,8 @@ def main():
     )
     parser.add_argument(
         "--phase",
-        choices=["1", "2", "3", "all"],
-        help="Which phase to run: 1 (flat), 2 (MCMC), 3 (refinement), or all (1 then 2 then 3)",
+        choices=["1", "2", "3", "4", "all"],
+        help="Which phase to run: 1 (flat), 2 (MCMC), 3 (refinement), 4 (blind-spot), or all",
     )
     parser.add_argument(
         "--jobs",
@@ -318,8 +357,10 @@ def main():
         jobs = PHASE2_JOBS
     elif args.phase == "3":
         jobs = PHASE3_JOBS
+    elif args.phase == "4":
+        jobs = PHASE4_JOBS
     elif args.phase == "all":
-        # Phase 1 first, then Phase 2, then Phase 3
+        # Phase 1 first, then Phase 2, then Phase 3, then Phase 4
         pass  # handled below
 
     # Verify environment
@@ -337,7 +378,7 @@ def main():
 
     if args.dry_run:
         if args.phase == "all":
-            for phase_name, phase_jobs in [("Phase 1", PHASE1_JOBS), ("Phase 2", PHASE2_JOBS), ("Phase 3", PHASE3_JOBS)]:
+            for phase_name, phase_jobs in [("Phase 1", PHASE1_JOBS), ("Phase 2", PHASE2_JOBS), ("Phase 3", PHASE3_JOBS), ("Phase 4", PHASE4_JOBS)]:
                 print(f"{phase_name} jobs:")
                 for j in phase_jobs:
                     print(f"  genModels.py --config_file {j['config']} --scan_dir {j['scan_dir']} --seed {j['seed']}")
@@ -351,7 +392,8 @@ def main():
     if args.phase == "all":
         for phase_name, phase_jobs in [("Phase 1: Flat scans", PHASE1_JOBS),
                                         ("Phase 2: MCMC scans", PHASE2_JOBS),
-                                        ("Phase 3: Refinement scans", PHASE3_JOBS)]:
+                                        ("Phase 3: Refinement scans", PHASE3_JOBS),
+                                        ("Phase 4: Blind-spot scans", PHASE4_JOBS)]:
             print(f"\n{phase_name}")
             results = run_jobs_parallel(phase_jobs, args.max_workers, args.project_root)
             n_failed = sum(1 for r in results if r["status"] != "SUCCESS")
