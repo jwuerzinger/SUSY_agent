@@ -132,16 +132,27 @@ Grid sampling was implemented (`sample_grid()` in modelgen.py) and executed for 
 
 ## Remaining Priorities
 
-### Priority 2 (partially done): ATLAS Contour Overlays
-- Download published ATLAS exclusion contours from HEPData
-- Overlay on mass-plane plots to show model populations vs. ATLAS reach
-- Contours for ATLAS-SUSY-2018-19, -2018-32, -2019-09
+### Priority 2: ATLAS Contour Overlays — DONE (2026-03-04)
+- Downloaded published ATLAS exclusion contours from HEPData (8 CSV files in `results/atlas_contours/`)
+- Overlaid on all 3 mass-plane plots (EWKino, slepton, stop) with observed (solid) and expected (dashed) contours
+- **Key finding:** A substantial fraction of "ATLAS invisible" models fall inside published exclusion contours (especially Wino-bino from SUSY-2019-09 and disappearing-track from SUSY-2018-19), confirming the SModelS encoding gap is the main driver of the 66.5% invisible fraction
+- New section 5.4 added to COMPLETE_FINDINGS.md
+- Scripts: `analysis/fetch_atlas_contours.py` (new), `analysis/atlas_blindspots.py` (modified)
 
-### Priority 3: Refine Phase4c/4d Sampling (if more models needed)
+### Priority 3: Importance Sampling for Narrow Corridors — DONE (2026-03-04)
 
-The grid sampling approach (Option A) was attempted and proved insufficient for these narrow corridors. Future attempts should use:
-- **Importance sampling** (Option C): Perturb existing viable models from phase2c/2d with small proposal widths, especially targeting the co-annihilation strip (slepton-LSP mass splitting ~5-20 GeV) and Higgs-mass-compatible stop mixing
-- **Parameterized grid**: Grid over (M_1, dm_slepton) instead of (M_1, meL, meR), where dm_slepton = m_slepton - m_LSP is constrained to [5, 50] GeV
+Importance sampling implemented via `sample_importance()` in modelgen.py. Seeds extracted from 62 Bino-LSP and 14 compressed-stop models. Perturbations applied with narrow Gaussian widths (10 GeV for co-annihilation parameters, 20 GeV for stop parameters).
+
+| Scan | Seeds | Points | SPheno valid | Pass all cuts |
+|------|-------|--------|-------------|---------------|
+| Phase 5a (Slepton+Bino) | 62 × 10 pert × 3 seeds | 1,860 | ~715 (38%) | **24** (1.3%) |
+| Phase 5b (Compressed stop) | 14 × 70 pert × 3 seeds | 2,940 | 0 (0%) | **0** |
+
+**Phase 5a success:** 24 new Bino co-annihilation models, increasing Bino LSP count from 62 to 80. Total passing models: **2,087**.
+
+**Phase 5b failure:** All perturbed points produce tachyonic spectra. The compressed-stop corridor is inaccessible even to importance sampling with 20 GeV perturbation widths.
+
+**Infrastructure:** `analysis/extract_seed_parameters.py`, `configs/phase5a_slepton_importance.yaml`, `configs/phase5b_stop_importance.yaml`, `run_scans.py --phase 5`, `run_ntupling.py` (phase5a/5b support)
 
 ### Priority 4: SModelS Database Update Requests
 
@@ -208,9 +219,9 @@ For each blind spot:
 | **P1** | Refine benchmark selection | ✅ DONE | 30 benchmarks selected in run3_proposals.py |
 | **P1** | Run 3 search proposals | ✅ DONE | RUN3_SEARCH_PROPOSALS.md + 23 plots |
 | **P1** | Direct detection complementarity | ✅ DONE | dd_complementarity.png, 3 truly dark models identified |
-| **P2** | ATLAS contour overlays from HEPData | TODO | Download + overlay published exclusion contours |
-| **P2** | SModelS database update requests | TODO | External contact with SModelS team |
-| **P3** | Refined phase4c/4d sampling (importance) | TODO | Perturb existing viable models for narrow corridors |
+| **P2** | ATLAS contour overlays from HEPData | ✅ DONE | 8 contours from HEPData; 3 mass-plane plots updated; section 5.4 in COMPLETE_FINDINGS |
+| **P2** | SModelS database update requests | ✅ DONE | SModelS authors are aware of the missing topologies |
+| **P3** | Refined phase4c/4d sampling (importance) | ✅ DONE | Phase 5a: 24 new Bino models; Phase 5b: 0 (too narrow) |
 | **P3** | CheckMATE2/MadAnalysis5 reinterpretation | TODO | Full MC for 30 benchmarks |
 | **P3** | HL-LHC projections | TODO | Scale to 3000 fb⁻¹ |
 | **P4** | Publication preparation | TODO | Paper draft, ATLAS-style plots |

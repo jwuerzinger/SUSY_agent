@@ -1,0 +1,74 @@
+prior: importance
+num_models: 490  # overridden by importance logic (n_seeds * perturbations_per_seed)
+isGMSB: False
+
+importance:
+  seed_file: results/seeds_phase5b.csv
+  perturbations_per_seed: 70   # fewer seeds → more perturbations each
+  proposal_widths:
+    M_2: 20.0       # Wino LSP mass
+    mqL3: 20.0      # must stay compressed with LSP
+    mtR: 20.0       # must stay compressed with LSP
+    AT: 150.0       # critical for Higgs mass
+    tanb: 2.0
+    M_1: 50.0
+    M_3: 100.0
+    mu: 50.0
+    mbR: 20.0
+
+# Same ranges as phase4d for boundary enforcement
+parameters:
+  tanb: [5, 60]
+  M_1: [-800, 800]
+  M_2: [-800, 800]
+  M_3: [2000, 4000]
+  AT: [-6000, 6000]
+  Ab: [-2000, 2000]
+  Atau: [-2000, 2000]
+  mu: [[-2000, -500], [500, 2000]]
+  mA: [300, 2000]
+  meL: [500, 2000]
+  mtauL: [2000, 2000]
+  meR: [500, 2000]
+  mtauR: [2000, 2000]
+  mqL1: [4000, 4000]
+  mqL3: [200, 800]
+  muR: [4000, 4000]
+  mtR: [200, 800]
+  mdR: [4000, 4000]
+  mbR: [200, 800]
+
+steps:
+  - name: prep_input
+    output_dir: input
+    prefix: IN
+  - name: SPheno
+    input_dir: input
+    output_dir: SPheno
+    log_dir: SPheno_log
+    prefix: SP
+  - name: softsusy
+    input_dir: input
+    output_dir: softsusy
+    prefix: SS
+  - name: micromegas
+    input_dir: SPheno
+    output_dir: micromegas
+    prefix: MO
+  - name: superiso
+    input_dir: SPheno
+    output_dir: superiso
+    prefix: SI
+  - name: gm2calc
+    input_dir: SPheno
+    output_dir: gm2calc
+    prefix: GM2
+  - name: feynhiggs
+    input_dir: SPheno
+    output_dir: feynhiggs
+    log_dir: feynhiggs_log
+    prefix: FH
+  - name: SModelS
+    input_dir: SPheno
+    output_dir: SModelS
+    prefix: SModelS

@@ -26,7 +26,23 @@ import matplotlib.colors as mcolors
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '..')
 RESULTS_DIR = os.path.join(PROJECT_ROOT, 'results', 'atlas_coverage')
 PLOT_DIR = os.path.join(RESULTS_DIR, 'plots')
+CONTOUR_DIR = os.path.join(PROJECT_ROOT, 'results', 'atlas_contours')
 os.makedirs(PLOT_DIR, exist_ok=True)
+
+
+def load_contour(csv_path):
+    """Load a 2-column CSV contour file, return (x, y) numpy arrays.
+    Returns (None, None) if file doesn't exist."""
+    if not os.path.isfile(csv_path):
+        return None, None
+    x, y = [], []
+    with open(csv_path, 'r') as f:
+        reader = csv.DictReader(f)
+        cols = reader.fieldnames
+        for row in reader:
+            x.append(float(row[cols[0]]))
+            y.append(float(row[cols[1]]))
+    return np.array(x), np.array(y)
 
 
 def load_coverage_csv():
@@ -147,18 +163,49 @@ def plot_massplane_ewkino(rows):
             continue
         m_lsp = [r['m_lsp'] for r in subset]
         m_chi1p = [r['m_chi1p'] for r in subset]
-        ax.scatter(m_lsp, m_chi1p, c=tier_colors[t], s=25, alpha=0.8,
+        ax.scatter(m_chi1p, m_lsp, c=tier_colors[t], s=25, alpha=0.8,
                    label=f'{tier_labels[t]} ({len(subset)})', edgecolors='black', linewidths=0.3,
                    zorder=5-t)
 
     ax.plot([0, 1500], [0, 1500], 'k--', alpha=0.3, label='m(chi1+)=m(LSP)')
-    ax.plot([0, 1500], [103, 1603], 'k:', alpha=0.3)  # LEP limit
-    ax.set_xlabel('m(chi10) [GeV]', fontsize=12)
-    ax.set_ylabel('m(chi1+) [GeV]', fontsize=12)
+    ax.plot([103, 1603], [0, 1500], 'k:', alpha=0.3)  # LEP limit
+
+    # --- ATLAS exclusion contour overlays ---
+    # Contour CSVs: col0=m_chi10, col1=m_chi1pm. Plot as x=m_chi1pm, y=m_chi10.
+    # Wino-bino (SUSY-2019-09)
+    cw_lsp_obs, cw_c1p_obs = load_contour(os.path.join(CONTOUR_DIR, 'susy2019_09_wino_obs.csv'))
+    cw_lsp_exp, cw_c1p_exp = load_contour(os.path.join(CONTOUR_DIR, 'susy2019_09_wino_exp.csv'))
+    if cw_lsp_obs is not None:
+        ax.plot(cw_c1p_obs, cw_lsp_obs, color='blue', linewidth=2, zorder=10,
+                label='ATLAS Wino-bino (SUSY-2019-09)')
+        ax.fill(np.append(cw_c1p_obs, cw_c1p_obs[-1]), np.append(cw_lsp_obs, cw_lsp_obs[0]),
+                color='blue', alpha=0.10, zorder=9)
+    if cw_lsp_exp is not None:
+        ax.plot(cw_c1p_exp, cw_lsp_exp, color='blue', linewidth=1.5, linestyle='--', zorder=10)
+
+    # Higgsino (SUSY-2019-09)
+    ch_lsp_obs, ch_c1p_obs = load_contour(os.path.join(CONTOUR_DIR, 'susy2019_09_higgsino_obs.csv'))
+    ch_lsp_exp, ch_c1p_exp = load_contour(os.path.join(CONTOUR_DIR, 'susy2019_09_higgsino_exp.csv'))
+    if ch_lsp_obs is not None:
+        ax.plot(ch_c1p_obs, ch_lsp_obs, color='purple', linewidth=2, zorder=10,
+                label='ATLAS Higgsino (SUSY-2019-09)')
+        ax.fill(np.append(ch_c1p_obs, ch_c1p_obs[-1]), np.append(ch_lsp_obs, ch_lsp_obs[0]),
+                color='purple', alpha=0.10, zorder=9)
+    if ch_lsp_exp is not None:
+        ax.plot(ch_c1p_exp, ch_lsp_exp, color='purple', linewidth=1.5, linestyle='--', zorder=10)
+
+    # Disappearing track pure Wino limit (SUSY-2018-19): m(chi1+) < 660 GeV
+    # Vertical line at x=660, from y=0 to y=660
+    ax.plot([660, 660], [0, 660], color='darkblue', linewidth=2, linestyle='-', zorder=10,
+            label='ATLAS disapp. track (SUSY-2018-19)')
+    ax.fill_betweenx([0, 660], 0, 660, color='darkblue', alpha=0.06, zorder=9)
+
+    ax.set_xlabel('m(chi1+) [GeV]', fontsize=12)
+    ax.set_ylabel('m(chi10) [GeV]', fontsize=12)
     ax.set_title('EWKino Mass Plane: ATLAS Coverage', fontsize=13)
-    ax.legend(fontsize=9, loc='upper left')
-    ax.set_xlim(0, max(r['m_lsp'] for r in rows) * 1.05)
-    ax.set_ylim(0, max(r['m_chi1p'] for r in rows) * 1.05)
+    ax.legend(fontsize=8, loc='upper left')
+    ax.set_xlim(0, max(r['m_chi1p'] for r in rows) * 1.05)
+    ax.set_ylim(0, max(r['m_lsp'] for r in rows) * 1.05)
     fig.savefig(os.path.join(PLOT_DIR, 'massplane_ewkino.png'), dpi=150, bbox_inches='tight')
     plt.close(fig)
     print("  massplane_ewkino.png")
@@ -177,19 +224,30 @@ def plot_massplane_slepton(rows):
             continue
         m_lsp = [r['m_lsp'] for r in subset]
         m_sl = [min(r['m_eL'], r['m_eR']) for r in subset]
-        ax.scatter(m_lsp, m_sl, c=tier_colors[t], s=25, alpha=0.8,
+        ax.scatter(m_sl, m_lsp, c=tier_colors[t], s=25, alpha=0.8,
                    label=f'{tier_labels[t]} ({len(subset)})', edgecolors='black', linewidths=0.3,
                    zorder=5-t)
 
     ax.plot([0, 2000], [0, 2000], 'k--', alpha=0.3, label='m(slepton)=m(LSP)')
-    # ATLAS slepton reach approximate boundary
-    ax.axhline(180, color='purple', linestyle='--', alpha=0.4, label='ATLAS reach ~180 GeV')
-    ax.set_xlabel('m(chi10) [GeV]', fontsize=12)
-    ax.set_ylabel('min(m_eL, m_eR) [GeV]', fontsize=12)
+
+    # --- ATLAS exclusion contour overlay (SUSY-2018-32) ---
+    # CSV: col0=m_chi10, col1=m_slepton. Plot as x=m_slepton, y=m_chi10.
+    cs_lsp_obs, cs_sl_obs = load_contour(os.path.join(CONTOUR_DIR, 'susy2018_32_slepton_obs.csv'))
+    cs_lsp_exp, cs_sl_exp = load_contour(os.path.join(CONTOUR_DIR, 'susy2018_32_slepton_exp.csv'))
+    if cs_lsp_obs is not None:
+        ax.plot(cs_sl_obs, cs_lsp_obs, color='magenta', linewidth=2, zorder=10,
+                label='ATLAS sleptons (SUSY-2018-32)')
+        ax.fill(np.append(cs_sl_obs, cs_sl_obs[-1]), np.append(cs_lsp_obs, cs_lsp_obs[0]),
+                color='magenta', alpha=0.12, zorder=9)
+    if cs_lsp_exp is not None:
+        ax.plot(cs_sl_exp, cs_lsp_exp, color='magenta', linewidth=1.5, linestyle='--', zorder=10)
+
+    ax.set_xlabel('min(m_eL, m_eR) [GeV]', fontsize=12)
+    ax.set_ylabel('m(chi10) [GeV]', fontsize=12)
     ax.set_title('Slepton Mass Plane: ATLAS Coverage', fontsize=13)
-    ax.legend(fontsize=9, loc='upper left')
-    ax.set_xlim(0, 1000)
-    ax.set_ylim(0, 2100)
+    ax.legend(fontsize=8, loc='upper left')
+    ax.set_xlim(0, 2100)
+    ax.set_ylim(0, 1000)
     fig.savefig(os.path.join(PLOT_DIR, 'massplane_slepton.png'), dpi=150, bbox_inches='tight')
     plt.close(fig)
     print("  massplane_slepton.png")
@@ -208,16 +266,29 @@ def plot_massplane_stop(rows):
             continue
         m_lsp = [r['m_lsp'] for r in subset]
         m_t1 = [r['m_t1'] for r in subset]
-        ax.scatter(m_lsp, m_t1, c=tier_colors[t], s=25, alpha=0.8,
+        ax.scatter(m_t1, m_lsp, c=tier_colors[t], s=25, alpha=0.8,
                    label=f'{tier_labels[t]} ({len(subset)})', edgecolors='black', linewidths=0.3,
                    zorder=5-t)
 
     ax.plot([0, 3000], [0, 3000], 'k--', alpha=0.3, label='m(stop)=m(LSP)')
-    ax.plot([0, 3000], [173.3, 3173.3], 'k:', alpha=0.3)  # m_stop = m_LSP + m_top
-    ax.set_xlabel('m(chi10) [GeV]', fontsize=12)
-    ax.set_ylabel('m(stop1) [GeV]', fontsize=12)
+    ax.plot([173.3, 3173.3], [0, 3000], 'k:', alpha=0.3)  # m_stop = m_LSP + m_top
+
+    # --- ATLAS exclusion contour overlay (stop all-hadronic) ---
+    # CSV: col0=m_chi10, col1=m_stop. Plot as x=m_stop, y=m_chi10.
+    ct_lsp_obs, ct_st_obs = load_contour(os.path.join(CONTOUR_DIR, 'stop_hadronic_obs.csv'))
+    ct_lsp_exp, ct_st_exp = load_contour(os.path.join(CONTOUR_DIR, 'stop_hadronic_exp.csv'))
+    if ct_lsp_obs is not None:
+        ax.plot(ct_st_obs, ct_lsp_obs, color='cyan', linewidth=2, zorder=10,
+                label='ATLAS stop (all-had.)')
+        ax.fill(np.append(ct_st_obs, ct_st_obs[-1]), np.append(ct_lsp_obs, ct_lsp_obs[0]),
+                color='cyan', alpha=0.12, zorder=9)
+    if ct_lsp_exp is not None:
+        ax.plot(ct_st_exp, ct_lsp_exp, color='cyan', linewidth=1.5, linestyle='--', zorder=10)
+
+    ax.set_xlabel('m(stop1) [GeV]', fontsize=12)
+    ax.set_ylabel('m(chi10) [GeV]', fontsize=12)
     ax.set_title('Stop Mass Plane: ATLAS Coverage', fontsize=13)
-    ax.legend(fontsize=9, loc='upper left')
+    ax.legend(fontsize=8, loc='upper left')
     fig.savefig(os.path.join(PLOT_DIR, 'massplane_stop.png'), dpi=150, bbox_inches='tight')
     plt.close(fig)
     print("  massplane_stop.png")

@@ -1,13 +1,13 @@
 # Run 3 ATLAS Search Proposals for pMSSM Blind Spots
 
 **Date:** 2026-03-04
-**Models analyzed:** 2063
+**Models analyzed:** 2087
 **Run 3 luminosity assumed:** 300 fb$^{-1}$
 **SModelS version:** 3.1.1
 
 ## 1. Executive Summary
 
-We analyze 2063 pMSSM models surviving all experimental constraints and identify five ATLAS blind spots containing a total of 1842 models that are invisible or poorly constrained.
+We analyze 2087 pMSSM models surviving all experimental constraints and identify five ATLAS blind spots containing a total of 1848 models that are invisible or poorly constrained.
 
 For each blind spot, we provide:
 - Concrete signal region definitions based on existing/extended ATLAS searches
@@ -15,17 +15,17 @@ For each blind spot, we provide:
 - Mass-grid benchmark SLHA files for Monte Carlo production
 - Direct detection complementarity assessment
 
-**Key finding:** 3 models are invisible to both ATLAS and projected direct detection experiments (below DARWIN sensitivity) — these can only be probed at the LHC with dedicated searches.
+**Key finding:** 15 models are invisible to both ATLAS and projected direct detection experiments (below DARWIN sensitivity) — these can only be probed at the LHC with dedicated searches.
 
 **Important caveat:** The ATLAS coverage assessment uses SModelS v3.1.1, which does not encode ATLAS disappearing-track (SUSY-2018-19), direct slepton (SUSY-2018-32), or compressed Higgsino (SUSY-2019-09) searches. Many Gap A/B/C models may already be constrained by these existing analyses. The proposals below focus on Run 3 extensions beyond the current reach.
 
 | Gap | Description | Models | Excludable (N>3) | Discoverable (N>10) | Priority |
 |-----|-------------|--------|------------------|---------------------|----------|
-| A | Compressed Wino | 526 | 103 | 73 | HIGH |
-| B | Compressed Higgsino | 737 | 34 | 11 | HIGH |
-| C | Light Sleptons | 497 | 145 | 108 | MEDIUM |
+| A | Compressed Wino | 520 | 102 | 72 | HIGH |
+| B | Compressed Higgsino | 737 | 42 | 19 | HIGH |
+| C | Light Sleptons | 509 | 165 | 128 | MEDIUM |
 | D | Compressed Stop | 2 | 2 | 2 | MEDIUM |
-| E | Complex EWKino | 80 | 21 | 12 | LOW |
+| E | Complex EWKino | 80 | 22 | 13 | LOW |
 
 ---
 
@@ -60,18 +60,18 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 
 ## 3. Gap A: Compressed Wino — Disappearing Track Search
 
-**Models affected:** 526
+**Models affected:** 520
 **Reference analysis:** ATLAS-SUSY-2018-19
 
 ### Model Population
 
 | Property | Value |
 |----------|-------|
-| LSP composition | Wino=526 |
+| LSP composition | Wino=520 |
 | m(LSP) range | 103 - 890 GeV |
 | Median dm(chi1+, chi10) | 1.9 GeV |
-| Models with N_sig > 3 at 300/fb | 103 |
-| Models with N_sig > 10 at 300/fb | 73 |
+| Models with N_sig > 3 at 300/fb | 102 |
+| Models with N_sig > 10 at 300/fb | 72 |
 
 ### Signal Topology
 
@@ -104,8 +104,8 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 
 | Tag | scan_dir | model_id | m(LSP) | m(chi1+) | dm | sigma_13.6 [fb] | N_sig (300/fb) | ATLAS r |
 |-----|----------|----------|--------|----------|----|----------------|----------------|----------|
+| highest_xsec | scan_seed42 | 230 | 134 | 134 | 0.2 | 63.85 | 957.7 | 0.0000 |
 | highest_xsec | scan_seed137 | 19 | 404 | 404 | 2.6 | 56.63 | 849.5 | 0.0000 |
-| highest_xsec | scan_seed137 | 13 | 227 | 228 | 2.5 | 47.75 | 716.3 | 0.0000 |
 | closest_exclusion | scan_seed42 | 99 | 266 | 266 | 4.4 | 4.26 | 63.8 | 0.0099 |
 | lightest_lsp | scan_seed137 | 219 | 103 | 103 | 0.3 | 0.00 | 0.0 | 0.0000 |
 | mass_grid_299 | scan_seed137 | 179 | 300 | 300 | 0.9 | 0.00 | 0.0 | 0.0000 |
@@ -132,9 +132,9 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 |----------|-------|
 | LSP composition | Higgsino=737 |
 | m(LSP) range | 94 - 675 GeV |
-| Median dm(chi1+, chi10) | 3.0 GeV |
-| Models with N_sig > 3 at 300/fb | 34 |
-| Models with N_sig > 10 at 300/fb | 11 |
+| Median dm(chi1+, chi10) | 3.1 GeV |
+| Models with N_sig > 3 at 300/fb | 42 |
+| Models with N_sig > 10 at 300/fb | 19 |
 
 ### Signal Topology
 
@@ -170,13 +170,13 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 
 | Tag | scan_dir | model_id | m(LSP) | m(chi1+) | dm | sigma_13.6 [fb] | N_sig (300/fb) | ATLAS r |
 |-----|----------|----------|--------|----------|----|----------------|----------------|----------|
+| highest_xsec | scan_seed256 | 230 | 201 | 204 | 0.3 | 25.32 | 151.9 | 0.0000 |
 | highest_xsec | scan_seed256 | 131 | 352 | 354 | 3.5 | 13.06 | 78.4 | 0.0000 |
-| highest_xsec | scan_seed137 | 17 | 358 | 359 | 10.9 | 9.37 | 56.2 | 0.0000 |
 | closest_exclusion | scan_seed137 | 76 | 298 | 301 | 2.5 | 0.13 | 0.8 | 0.0098 |
 | lightest_lsp | scan_seed42 | 16 | 94 | 118 | 24.1 | 0.00 | 0.0 | 0.0000 |
 | mass_grid_239 | scan_seed256 | 247 | 239 | 241 | 2.3 | 0.00 | 0.0 | 0.0000 |
 | mass_grid_384 | scan_seed137 | 316 | 384 | 387 | 3.0 | 0.00 | 0.0 | 0.0000 |
-| mass_grid_529 | scan_seed137 | 244 | 533 | 535 | 1.7 | 0.00 | 0.0 | 0.0000 |
+| mass_grid_529 | scan_seed137 | 244 | 533 | 535 | 2.5 | 1.75 | 10.5 | 0.0000 |
 
 ### Plots
 
@@ -189,18 +189,18 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 
 ## 5. Gap C: Light Sleptons — Extended Dilepton + MET Search
 
-**Models affected:** 497
+**Models affected:** 509
 **Reference analysis:** ATLAS-SUSY-2018-32
 
 ### Model Population
 
 | Property | Value |
 |----------|-------|
-| LSP composition | Bino=32, Wino=245, Higgsino=220 |
+| LSP composition | Bino=44, Wino=245, Higgsino=220 |
 | m(LSP) range | 94 - 565 GeV |
-| Median dm(chi1+, chi10) | 3.4 GeV |
-| Models with N_sig > 3 at 300/fb | 145 |
-| Models with N_sig > 10 at 300/fb | 108 |
+| Median dm(chi1+, chi10) | 3.5 GeV |
+| Models with N_sig > 3 at 300/fb | 165 |
+| Models with N_sig > 10 at 300/fb | 128 |
 
 ### Signal Topology
 
@@ -234,8 +234,8 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 
 | Tag | scan_dir | model_id | m(LSP) | m(chi1+) | dm | sigma_13.6 [fb] | N_sig (300/fb) | ATLAS r |
 |-----|----------|----------|--------|----------|----|----------------|----------------|----------|
-| highest_xsec | scan_seed137 | 13 | 224 | 224 | 2.5 | 47.75 | 2148.8 | 0.0475 |
-| highest_xsec | scan_seed42 | 198 | 190 | 190 | 4.7 | 28.62 | 1287.7 | 0.0000 |
+| highest_xsec | scan_seed42 | 230 | 134 | 134 | 0.2 | 63.85 | 2873.0 | 0.0000 |
+| highest_xsec | scan_seed256 | 232 | 238 | 248 | 0.2 | 51.12 | 2300.4 | 0.0000 |
 | closest_exclusion | scan_seed256 | 63 | 470 | 473 | 3.3 | 1.64 | 73.8 | 0.0983 |
 | lightest_lsp | scan_seed42 | 16 | 94 | 118 | 24.1 | 0.00 | 0.0 | 0.0000 |
 | mass_grid_212 | scan_seed42 | 104 | 212 | 212 | 5.6 | 0.23 | 10.3 | 0.0078 |
@@ -320,9 +320,9 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 |----------|-------|
 | LSP composition | Bino=2, Wino=77, Higgsino=1 |
 | m(LSP) range | 104 - 467 GeV |
-| Median dm(chi1+, chi10) | 2.9 GeV |
-| Models with N_sig > 3 at 300/fb | 21 |
-| Models with N_sig > 10 at 300/fb | 12 |
+| Median dm(chi1+, chi10) | 3.1 GeV |
+| Models with N_sig > 3 at 300/fb | 22 |
+| Models with N_sig > 10 at 300/fb | 13 |
 
 ### Signal Topology
 
@@ -354,8 +354,8 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 
 | Tag | scan_dir | model_id | m(LSP) | m(chi1+) | dm | sigma_13.6 [fb] | N_sig (300/fb) | ATLAS r |
 |-----|----------|----------|--------|----------|----|----------------|----------------|----------|
+| highest_xsec | scan_seed137 | 239 | 112 | 112 | 7.8 | 16.38 | 245.8 | 0.0086 |
 | highest_xsec | scan_seed42 | 101 | 250 | 251 | 4.8 | 13.38 | 200.7 | 0.0081 |
-| highest_xsec | scan_seed42 | 100 | 277 | 277 | 4.5 | 6.97 | 104.5 | 0.0092 |
 | closest_exclusion | scan_seed137 | 122 | 199 | 199 | 28.8 | 0.00 | 0.0 | 0.0100 |
 | lightest_lsp | scan_seed42 | 216 | 104 | 104 | 1.6 | 0.00 | 0.0 | 0.0087 |
 | mass_grid_194 | scan_seed137 | 147 | 195 | 195 | 0.8 | 0.04 | 0.5 | 0.0000 |
@@ -375,7 +375,7 @@ where acceptance factors are estimated from published ATLAS efficiency maps.
 
 We compare the spin-independent (SI) proton-neutralino cross-section with projected sensitivities of XENON-nT, LZ, and DARWIN.
 
-- **3 models** are below DARWIN sensitivity AND invisible to ATLAS
+- **15 models** are below DARWIN sensitivity AND invisible to ATLAS
 - These "truly dark" models can only be probed at the LHC with dedicated searches
 - Plot: `plots/dd_complementarity.png`
 
@@ -387,7 +387,7 @@ We compare the spin-independent (SI) proton-neutralino cross-section with projec
 
 1. **Encode existing searches in SModelS:** Disappearing tracks (SUSY-2018-19), direct sleptons (SUSY-2018-32), and compressed Higgsino (SUSY-2019-09) results should be added to the SModelS database. This alone would dramatically improve coverage assessment for Gaps A, B, and C.
 
-2. **Extend disappearing-track search (Gap A):** With 300 fb$^{-1}$ and ITk, extend the Wino mass reach from ~460 GeV (Run 2) toward 800+ GeV. 103 models are potentially excludable.
+2. **Extend disappearing-track search (Gap A):** With 300 fb$^{-1}$ and ITk, extend the Wino mass reach from ~460 GeV (Run 2) toward 800+ GeV. 102 models are potentially excludable.
 
 3. **Lower soft-lepton thresholds (Gap B):** ISR-boosted topology with improved low-pT lepton reconstruction. Target dm < 10 GeV region with mll binning down to 1 GeV.
 
@@ -405,8 +405,8 @@ Benchmark SLHA files are stored in `results/atlas_proposals/benchmarks/gap_X/`.
 
 | Tag | File | m(LSP) | m(chi1+) |
 |-----|------|--------|----------|
+| highest_xsec | gapA_highest_xsec_scan_seed42_m230.slha | 134 | 134 |
 | highest_xsec | gapA_highest_xsec_scan_seed137_m19.slha | 404 | 404 |
-| highest_xsec | gapA_highest_xsec_scan_seed137_m13.slha | 227 | 228 |
 | closest_exclusion | gapA_closest_exclusion_scan_seed42_m99.slha | 266 | 266 |
 | lightest_lsp | gapA_lightest_lsp_scan_seed137_m219.slha | 103 | 103 |
 | mass_grid_299 | gapA_mass_grid_299_scan_seed137_m179.slha | 300 | 300 |
@@ -417,8 +417,8 @@ Benchmark SLHA files are stored in `results/atlas_proposals/benchmarks/gap_X/`.
 
 | Tag | File | m(LSP) | m(chi1+) |
 |-----|------|--------|----------|
+| highest_xsec | gapB_highest_xsec_scan_seed256_m230.slha | 201 | 204 |
 | highest_xsec | gapB_highest_xsec_scan_seed256_m131.slha | 352 | 354 |
-| highest_xsec | gapB_highest_xsec_scan_seed137_m17.slha | 358 | 359 |
 | closest_exclusion | gapB_closest_exclusion_scan_seed137_m76.slha | 298 | 301 |
 | lightest_lsp | gapB_lightest_lsp_scan_seed42_m16.slha | 94 | 118 |
 | mass_grid_239 | gapB_mass_grid_239_scan_seed256_m247.slha | 239 | 241 |
@@ -429,8 +429,8 @@ Benchmark SLHA files are stored in `results/atlas_proposals/benchmarks/gap_X/`.
 
 | Tag | File | m(LSP) | m(chi1+) |
 |-----|------|--------|----------|
-| highest_xsec | gapC_highest_xsec_scan_seed137_m13.slha | 224 | 224 |
-| highest_xsec | gapC_highest_xsec_scan_seed42_m198.slha | 190 | 190 |
+| highest_xsec | gapC_highest_xsec_scan_seed42_m230.slha | 134 | 134 |
+| highest_xsec | gapC_highest_xsec_scan_seed256_m232.slha | 238 | 248 |
 | closest_exclusion | gapC_closest_exclusion_scan_seed256_m63.slha | 470 | 473 |
 | lightest_lsp | gapC_lightest_lsp_scan_seed42_m16.slha | 94 | 118 |
 | mass_grid_212 | gapC_mass_grid_212_scan_seed42_m104.slha | 212 | 212 |
@@ -448,8 +448,8 @@ Benchmark SLHA files are stored in `results/atlas_proposals/benchmarks/gap_X/`.
 
 | Tag | File | m(LSP) | m(chi1+) |
 |-----|------|--------|----------|
+| highest_xsec | gapE_highest_xsec_scan_seed137_m239.slha | 112 | 112 |
 | highest_xsec | gapE_highest_xsec_scan_seed42_m101.slha | 250 | 251 |
-| highest_xsec | gapE_highest_xsec_scan_seed42_m100.slha | 277 | 277 |
 | closest_exclusion | gapE_closest_exclusion_scan_seed137_m122.slha | 199 | 199 |
 | lightest_lsp | gapE_lightest_lsp_scan_seed42_m216.slha | 104 | 104 |
 | mass_grid_194 | gapE_mass_grid_194_scan_seed137_m147.slha | 195 | 195 |

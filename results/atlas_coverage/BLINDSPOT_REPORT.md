@@ -4,7 +4,7 @@
 
 ## Executive Summary
 
-Of 2063 surviving pMSSM models, **1372 (66.5%)** are completely invisible to ATLAS and **84** have only negligible ATLAS sensitivity (r < 0.01). We identify five specific gaps in the ATLAS search program:
+Of 2087 surviving pMSSM models, **1372 (65.7%)** are completely invisible to ATLAS and **84** have only negligible ATLAS sensitivity (r < 0.01). We identify five specific gaps in the ATLAS search program:
 
 ---
 
@@ -55,10 +55,10 @@ Of 2063 surviving pMSSM models, **1372 (66.5%)** are completely invisible to ATL
 
 ## Gap C: Light Sleptons 180-600 GeV
 
-**497 models** with sleptons < 600 GeV and ATLAS tier <= Weak.
+**509 models** with sleptons < 600 GeV and ATLAS tier <= Weak.
 
 - Slepton mass range: 204 - 598 GeV
-- LSP types: Bino=32, Wino=245, Higgsino=220
+- LSP types: Bino=44, Wino=245, Higgsino=220
 - Signal: slepton pair -> dilepton + MET (clean, low background)
 - Why ATLAS misses it: no ATLAS slepton topology in SModelS v3.1.1
 - ATLAS reach: ~180 GeV (ATLAS-SUSY-2018-32)
@@ -116,6 +116,6 @@ Of 2063 surviving pMSSM models, **1372 (66.5%)** are completely invisible to ATL
 |-----|-------------|--------|------------|----------------------|
 | A | Compressed Wino | 616 | Displaced pion + MET | 12.1 |
 | B | Compressed Higgsino | 737 | Soft dileptons + MET | 0.6 |
-| C | Light sleptons | 497 | Dilepton + MET | 14418.8 |
+| C | Light sleptons | 509 | Dilepton + MET | 14418.8 |
 | D | Compressed stop + displaced | 7 | b + displaced pion + MET | 14418.8 |
 | E | Complex EWKino cascades | 41 | Multi-body finals | 12.1 |

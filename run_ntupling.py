@@ -28,6 +28,8 @@ SCAN_CONFIGS = {
     'phase4e': 'configs/phase4e_mixed_ewkino.yaml',
     'phase4c_grid': 'configs/phase4c_slepton_bino_grid.yaml',
     'phase4d_grid': 'configs/phase4d_compressed_stop_grid.yaml',
+    'phase5a': 'configs/phase5a_slepton_importance.yaml',
+    'phase5b': 'configs/phase5b_stop_importance.yaml',
 }
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))

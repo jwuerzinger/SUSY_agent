@@ -189,6 +189,30 @@ for _seed in PHASE4_GRID_SEEDS:
         },
     ])
 
+# Phase 5: Importance sampling from known viable models for narrow corridors.
+# phase5a: slepton+Bino co-annihilation (perturb ~62 Bino-LSP seeds)
+# phase5b: compressed stop (perturb ~14 compressed-stop seeds)
+PHASE5_SEEDS = [42, 137, 256]
+
+PHASE5_JOBS = []
+for _seed in PHASE5_SEEDS:
+    PHASE5_JOBS.extend([
+        {
+            "name": f"phase5a_slepton_imp_s{_seed}",
+            "config": "configs/phase5a_slepton_importance.yaml",
+            "scan_dir": f"scans/phase5a/scan_seed{_seed}",
+            "seed": _seed,
+            "timeout": 14400,  # 4 hours
+        },
+        {
+            "name": f"phase5b_stop_imp_s{_seed}",
+            "config": "configs/phase5b_stop_importance.yaml",
+            "scan_dir": f"scans/phase5b/scan_seed{_seed}",
+            "seed": _seed,
+            "timeout": 14400,  # 4 hours
+        },
+    ])
+
 # ── Worker function ──────────────────────────────────────────────────────────
 
 
@@ -341,8 +365,8 @@ def main():
     )
     parser.add_argument(
         "--phase",
-        choices=["1", "2", "3", "4", "4grid", "all"],
-        help="Which phase to run: 1 (flat), 2 (MCMC), 3 (refinement), 4 (blind-spot), 4grid (grid rescans), or all",
+        choices=["1", "2", "3", "4", "4grid", "5", "all"],
+        help="Which phase to run: 1 (flat), 2 (MCMC), 3 (refinement), 4 (blind-spot), 4grid (grid rescans), 5 (importance sampling), or all",
     )
     parser.add_argument(
         "--jobs",
@@ -387,6 +411,8 @@ def main():
         jobs = PHASE4_JOBS
     elif args.phase == "4grid":
         jobs = PHASE4_GRID_JOBS
+    elif args.phase == "5":
+        jobs = PHASE5_JOBS
     elif args.phase == "all":
         # Phase 1 first, then Phase 2, then Phase 3, then Phase 4
         pass  # handled below
@@ -406,7 +432,7 @@ def main():
 
     if args.dry_run:
         if args.phase == "all":
-            for phase_name, phase_jobs in [("Phase 1", PHASE1_JOBS), ("Phase 2", PHASE2_JOBS), ("Phase 3", PHASE3_JOBS), ("Phase 4", PHASE4_JOBS), ("Phase 4 Grid", PHASE4_GRID_JOBS)]:
+            for phase_name, phase_jobs in [("Phase 1", PHASE1_JOBS), ("Phase 2", PHASE2_JOBS), ("Phase 3", PHASE3_JOBS), ("Phase 4", PHASE4_JOBS), ("Phase 4 Grid", PHASE4_GRID_JOBS), ("Phase 5", PHASE5_JOBS)]:
                 print(f"{phase_name} jobs:")
                 for j in phase_jobs:
                     print(f"  genModels.py --config_file {j['config']} --scan_dir {j['scan_dir']} --seed {j['seed']}")
@@ -422,7 +448,8 @@ def main():
                                         ("Phase 2: MCMC scans", PHASE2_JOBS),
                                         ("Phase 3: Refinement scans", PHASE3_JOBS),
                                         ("Phase 4: Blind-spot scans", PHASE4_JOBS),
-                                        ("Phase 4 Grid: Grid rescans", PHASE4_GRID_JOBS)]:
+                                        ("Phase 4 Grid: Grid rescans", PHASE4_GRID_JOBS),
+                                        ("Phase 5: Importance sampling", PHASE5_JOBS)]:
             print(f"\n{phase_name}")
             results = run_jobs_parallel(phase_jobs, args.max_workers, args.project_root)
             n_failed = sum(1 for r in results if r["status"] != "SUCCESS")

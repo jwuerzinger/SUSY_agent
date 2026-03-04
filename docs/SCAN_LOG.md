@@ -268,17 +268,57 @@ Phase 3 targeted specific gaps identified in Phase 2 analysis. Three new scan ty
 
 ---
 
+## Phase 5: Importance Sampling
+
+Importance sampling from known viable models, targeting the two corridors where MCMC and grid both failed.
+
+### Phase 5a: Slepton + Bino Co-annihilation (SUCCESS — 24 new passing models)
+- **Date:** 2026-03-04
+- **Config:** configs/phase5a_slepton_importance.yaml
+- **Prior:** importance (62 seeds × 10 perturbations)
+- **Seeds:** 42, 137, 256
+- **Models generated:** 620 × 3 seeds = 1,860
+- **Perturbation widths:** M_1=10, meL=10, meR=10, AT=200, tanb=2, M_3=100, mu=50, mA=100, Ab=50, Atau=50
+- **Runtime:** ~45 min per seed
+- **Pipeline success rates:**
+  - SPheno valid: ~715/1860 (38%)
+  - Softsusy: ~715/1860 (38%)
+  - Full pipeline (SModelS): ~616/1860 (33%)
+- **Passing all cuts:** 24 (1.3% of total, 3.4% of valid spectra)
+- **Observations:** First method to successfully generate new Bino co-annihilation models. The 10 GeV perturbation width for slepton masses is well-matched to the ~10-20 GeV co-annihilation strip width.
+- **Ntuple paths:** scans/phase5a/scan_seed{42,137,256}/ntuple.0.0.root
+
+### Phase 5b: Compressed Stop (FAILED — 0 SPheno successes)
+- **Date:** 2026-03-04
+- **Config:** configs/phase5b_stop_importance.yaml
+- **Prior:** importance (14 seeds × 70 perturbations)
+- **Seeds:** 42, 137, 256
+- **Models generated:** 980 × 3 seeds = 2,940
+- **Perturbation widths:** M_2=20, mqL3=20, mtR=20, AT=150, tanb=2, M_1=50, M_3=100, mu=50, mbR=20
+- **Runtime:** ~6 sec per seed (all fail SPheno immediately)
+- **Pipeline success rates:**
+  - SPheno valid: 0/2940 (0%) — all produce negative mass-squared (tachyonic sfermions)
+- **Passing all cuts:** 0
+- **Observations:** Even 20 GeV perturbations in stop-sector parameters (mqL3, mtR) push models into tachyonic territory. The compressed-stop corridor is truly one-dimensional — the seed models sit on a knife-edge in parameter space.
+- **Ntuple paths:** scans/phase5b/scan_seed{42,137,256}/ntuple.0.0.root
+
+---
+
 ## Final Combined Results (All Phases, with LEP cut)
 
-- **Total ntuple entries:** 13523 (2000 Phase 1 + 7516 Phase 2 + 4507 Phase 3)
-- **Passing all cuts (including m(chi1+) > 103 GeV):** 458 (3.4%)
+- **Total ntuple entries:** 26,048 (2000 Phase 1 + 7516 Phase 2 + 4507 Phase 3 + 10,665 Phase 4/Grid + 1,860 Phase 5)
+- **Passing all cuts (including m(chi1+) > 103 GeV):** 2,087 (8.0%)
   - Phase 1: 5
   - Phase 2a: 163
   - Phase 2b: 134
   - Phase 2c: 71
   - Phase 2d: 83
   - Phase 3b: 2
-- **LSP composition:** Bino=29, Wino=359, Higgsino=70
+  - Phase 4a: 698
+  - Phase 4b: 532
+  - Phase 4e: 375
+  - Phase 5a: 24
+- **LSP composition:** Bino=80, Wino=1009, Higgsino=998
 - **All 9 physics categories populated**
 - **Benchmark models extracted per category**
 - **Plots:** results/plots/final_*.png
