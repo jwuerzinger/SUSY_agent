@@ -369,6 +369,24 @@ Despite the small model count, the uncovered cross-sections are very large (up t
 - Z-veto for OSSF pairs
 - meff discriminant
 
+### 6.6 Unexpected Blind Spots: Models That Should Be Excluded
+
+Of the five gaps, most represent expected blind spots (compressed EWKino spectra evading simplified models is well-known). However, three categories are genuinely surprising — models at masses and cross-sections where simplified model results would predict exclusion:
+
+**1. Light sleptons with Bino LSP (21 models, atlas_tier=0)**
+
+ATLAS-SUSY-2018-32 excludes sleptons up to ~700 GeV for massless LSP, yet 21 models with sleptons at 270-580 GeV and Bino LSP masses of 140-400 GeV are completely invisible. In simplified model interpretations, direct slepton pair production -> dilepton + MET is one of the cleanest SUSY signatures with near-zero background. The escape mechanisms are: (a) SModelS v3.1.1 does not encode the ATLAS slepton topology at all, and (b) in the pMSSM, slepton decay chains can route through intermediate charginos/neutralinos, diluting the clean dilepton signature below the simplified-model branching ratio assumption of 100%.
+
+**2. Compressed stops with displaced charginos (2 models, cross-sections up to 14 pb)**
+
+Two models with stops at 268 and 337 GeV have cross-sections of 4.6 and 9,654 fb respectively — firmly within the T2tt simplified-model exclusion contour, where stop pair production should be excluded by multiple ATLAS analyses. The escape mechanism is the Wino LSP: the stop decays as stop -> b + chi1+ (long-lived, ctau ~ 1-10 cm) -> b + soft pion + chi10. This creates a signature that is neither fully prompt (displaced chargino) nor fully displaced (soft pion below tracking threshold), falling through the cracks between prompt stop searches and disappearing-track searches. This represents a genuinely novel gap requiring a dedicated b-jet + displaced vertex search.
+
+**3. 534 Wino models below the disappearing-track limit (atlas_tier=0)**
+
+ATLAS-SUSY-2018-19 excludes pure Winos up to ~660 GeV, yet 534 Wino models with m(chi1+) < 660 GeV are completely invisible in SModelS. In simplified model terms, every one should already be excluded. This is primarily a SModelS encoding gap (the disappearing-track topology is absent from the v3.1.1 database), but pMSSM mixing effects can shift the mass splitting from the pure-Wino prediction (~160 MeV), potentially making some charginos decay too fast or too slowly for the standard tracklet requirement. Encoding SUSY-2018-19 in SModelS would be the single highest-impact action for the coverage assessment.
+
+**What is NOT surprising:** Compressed Higgsino models (Gap B, 737 models) with dm < 5 GeV producing leptons below trigger thresholds, and complex EWKino cascades (Gap E, 80 models) with multi-body final states inherently hard for simplified models. These are expected limitations of the simplified-model framework. Also notable: zero viable light stops (m < 800 GeV) are invisible to ATLAS — the T2tt simplified model works well for standard stop decay chains.
+
 ---
 
 ## 7. Direct Detection Complementarity
@@ -515,7 +533,7 @@ The m(chi1+) > 103 GeV constraint removes ~24% of pre-LEP models, eliminating ul
 
 3. **No CP violation.** Relaxing this would add parameters but enable new phenomenology (EDMs, CP-violating Higgs sector).
 
-4. **SModelS topology coverage** is incomplete. The "ATLAS invisible" count (66.5%) is an overestimate — many models may be constrained by analyses not yet encoded in SModelS v3.1.1. Published ATLAS exclusion contours overlaid on the mass-plane plots (Section 5.4) confirm that a substantial fraction of "invisible" models fall within the reach of SUSY-2019-09 (compressed EWKino), SUSY-2018-19 (disappearing tracks), and SUSY-2018-32 (direct sleptons).
+4. **SModelS topology coverage** is incomplete. The "ATLAS invisible" count (65.7%) is an overestimate — many models may be constrained by analyses not yet encoded in SModelS v3.1.1. Published ATLAS exclusion contours overlaid on the mass-plane plots (Section 5.4) confirm that a substantial fraction of "invisible" models fall within the reach of SUSY-2019-09 (compressed EWKino), SUSY-2018-19 (disappearing tracks), and SUSY-2018-32 (direct sleptons).
 
 5. **Statistics.** While 2,087 models is sufficient for identifying categories and benchmarks, robust probability statements about the pMSSM require O(10^6) models and a profile likelihood analysis.
 
@@ -530,7 +548,7 @@ The m(chi1+) > 103 GeV constraint removes ~24% of pre-LEP models, eliminating ul
 | File | Description |
 |------|-------------|
 | `results/COMPLETE_FINDINGS.md` | This document: comprehensive summary of all findings |
-| `results/SUMMARY.md` | Physics summary (Phases 1-3, 458 models) |
+| `results/SUMMARY.md` | Physics summary (all phases, 2,087 models) |
 | `results/atlas_coverage/ATLAS_COVERAGE_REPORT.md` | SModelS coverage analysis (2,087 models) |
 | `results/atlas_coverage/BLINDSPOT_REPORT.md` | Five blind spot characterisation |
 | `results/atlas_proposals/ATLAS_GAP_ANALYSIS.md` | Gap analysis with 25 benchmarks |
