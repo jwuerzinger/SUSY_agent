@@ -1,5 +1,7 @@
 # SUSY_agent
 
+**DISCLAIMER**: This repo is 100% generated with Claude code!
+
 Systematic investigation of the pMSSM (phenomenological MSSM) parameter space to identify viable SUSY models and gaps in the ATLAS search programme at the LHC.
 
 **[Comprehensive findings document](results/COMPLETE_FINDINGS.md)** — full summary of all results, ATLAS blind spots, Run 3 search proposals, and benchmark spectra.
