@@ -1,0 +1,755 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% Theme and colors
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+\definecolor{darkblue}{RGB}{0,51,102}
+\definecolor{atlasblue}{RGB}{0,73,135}
+\definecolor{linkblue}{RGB}{30,100,200}
+\setbeamercolor{structure}{fg=darkblue}
+\setbeamercolor{frametitle}{bg=darkblue,fg=white}
+\setbeamercolor{title}{bg=darkblue,fg=white}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+      \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.34\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}\insertframenumber{}/\inserttotalframenumber\hspace*{2ex}
+    \end{beamercolorbox}}%
+}
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{appendixnumberbeamer}
+\usepackage{xspace}
+\usepackage{hyperref}
+
+% Backup-link helper: small button pointing to a labelled backup slide
+\newcommand{\backuplink}[2]{\hfill\hyperlink{#1}{\beamergotobutton{\tiny #2}}}
+
+% Shortcuts
+\newcommand{\GeV}{\,\text{GeV}\xspace}
+\newcommand{\TeV}{\,\text{TeV}\xspace}
+\newcommand{\fb}{\,\text{fb}\xspace}
+\newcommand{\pb}{\,\text{pb}\xspace}
+\newcommand{\MET}{\ensuremath{E_{\text{T}}^{\text{miss}}}\xspace}
+\newcommand{\mll}{\ensuremath{m_{\ell\ell}}\xspace}
+\newcommand{\mTtwo}{\ensuremath{m_{\text{T2}}}\xspace}
+\newcommand{\chipm}{\ensuremath{\tilde{\chi}_1^\pm}\xspace}
+\newcommand{\chioz}{\ensuremath{\tilde{\chi}_1^0}\xspace}
+\newcommand{\chitwo}{\ensuremath{\tilde{\chi}_2^0}\xspace}
+\newcommand{\Omegah}{\ensuremath{\Omega h^2}\xspace}
+\newcommand{\mh}{\ensuremath{m_h}\xspace}
+\newcommand{\ctau}{\ensuremath{c\tau}\xspace}
+
+% Plot macros with height constraint
+\newcommand{\plotfull}[1]{\includegraphics[width=0.70\textwidth,height=0.68\textheight,keepaspectratio]{#1}}
+\newcommand{\plothalf}[1]{\includegraphics[width=\textwidth,height=0.68\textheight,keepaspectratio]{#1}}
+\newcommand{\plotthird}[1]{\includegraphics[width=\textwidth,height=0.55\textheight,keepaspectratio]{#1}}
+
+\graphicspath{
+  {../results/plots/}
+  {../results/atlas_coverage/plots/}
+  {../results/atlas_proposals/plots/}
+}
+
+\title[pMSSM Blind Spots]{pMSSM Parameter Space Investigation\\and ATLAS Blind Spot Analysis}
+\author[Wuerzinger \& Claude]{J.~Wuerzinger \and Claude (Anthropic)}
+\institute{pMSSM Working Group Meeting}
+\date{March 2026}
+
+\begin{document}
+
+% ============================================================
+%  MAIN BODY — 15 slides
+% ============================================================
+
+% ----- 1. Title -------------------------------------------
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+% ----- 2. Outline -----------------------------------------
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+% ----- 3. Motivation + method -----------------------------
+\begin{frame}{Motivation \& Method}
+\begin{columns}[T]
+\column{0.55\textwidth}
+\textbf{Why a pMSSM scan?}
+\begin{itemize}
+  \item Simplified models assume 100\% BRs --- pMSSM does not
+  \item 19-parameter scan $\to$ realistic spectra with mixed decays, compressed regions, co-annihilation corridors
+  \item Goal: identify \textbf{actual} ATLAS blind spots and propose Run~3 searches
+\end{itemize}
+\vspace{0.4em}
+\textbf{8-step pipeline:}\\ {\small SPheno $\to$ Softsusy $\to$ micrOMEGAs $\to$ SuperISO $\to$ GM2Calc $\to$ FeynHiggs $\to$ SModelS\,3.1.1 $\to$ Ntuple}
+\backuplink{backup:pipeline}{Pipeline details}
+
+\column{0.42\textwidth}
+\textbf{100\% AI-driven project}\\[0.3em]
+{\small Every component --- scan design, code, analysis, plots, and these slides --- was produced by \textbf{Claude} (Anthropic) via Claude Code.\\[0.4em]
+Full codebase:\\
+\url{https://github.com/jwuerzinger/SUSY_agent}
+}
+\vspace{0.6em}
+\textbf{6 selection cuts:}\\[0.2em]
+{\footnotesize
+\begin{tabular}{ll}
+\toprule
+Higgs mass & $122\!<\!\mh\!<\!128\GeV$ \\
+Relic density & $\Omegah \leq 0.132$ \\
+B-physics & $2\sigma$ \\
+SModelS & $r < 1$ \\
+LEP & $m(\chipm)\!>\!103\GeV$ \\
+Quality & SP + SS converge \\
+\bottomrule
+\end{tabular}}
+\backuplink{backup:cuts}{Cut details}
+\end{columns}
+\end{frame}
+
+% ============================================================
+\section{Scan Strategy \& Results}
+% ============================================================
+
+% ----- 4. Scan + dataset overview -------------------------
+\begin{frame}{Scan Strategy \& Dataset}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\textbf{Five-phase scan:}
+\begin{enumerate}\setlength\itemsep{1pt}
+  \item Flat random (2\,k pts $\to$ 5)
+  \item Targeted MCMC $\times$4 chains (7\,k $\to$ 451)
+  \item Refinements (4.5\,k $\to$ 2)
+  \item Blind-spot targeting (7.1\,k $\to$ 1,605)
+  \item Importance sampling (4.8\,k $\to$ 24)
+\end{enumerate}
+\vspace{0.3em}
+\fbox{\textbf{26,048 evaluated $\;\to\;$ 2,087 pass all cuts}}
+\backuplink{backup:phases}{Phase breakdown}
+
+\column{0.48\textwidth}
+\textbf{LSP composition:}\\[0.3em]
+\begin{tabular}{lrr}
+\toprule
+\textbf{Type} & \textbf{N} & \textbf{Frac.} \\
+\midrule
+Wino     & 1,009 & 48.3\% \\
+Higgsino & 998   & 47.8\% \\
+Bino     & 80    & 3.8\% \\
+\bottomrule
+\end{tabular}
+\vspace{0.5em}
+
+{\small
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Wino/Higgsino: naturally under-abundant
+  \item Bino: needs co-annihilation or $A$-funnel (narrow corridors)
+  \item 99.5\% have $\Delta m(\chipm,\text{LSP})<50\GeV$
+\end{itemize}}
+\backuplink{backup:categories}{Category plot}
+\end{columns}
+\end{frame}
+
+% ----- 5. Key scatter plots -------------------------------
+\begin{frame}{Surviving Model Landscape}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{center}
+\plotthird{final_chargino_vs_lsp}
+\end{center}
+\vspace{-0.5em}
+{\footnotesize Chargino vs LSP mass. Models cluster along the diagonal --- compressed spectra dominate.}
+\column{0.48\textwidth}
+\begin{center}
+\plotthird{final_stop_vs_lsp}
+\end{center}
+\vspace{-0.5em}
+{\footnotesize Stop vs LSP mass. 293 light stops, only $\sim$2\% excluded. 7 compressed stops at $\Delta m < 200\GeV$.}
+\end{columns}
+\backuplink{backup:categories}{Categories plot}
+\end{frame}
+
+% ============================================================
+\section{ATLAS Coverage}
+% ============================================================
+
+% ----- 6. SModelS coverage --------------------------------
+\begin{frame}{ATLAS Coverage (SModelS v3.1.1)}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\plothalf{atlas_r_vs_mlsp}
+\column{0.46\textwidth}
+\vspace{0.5em}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Tier} & \textbf{N} & \textbf{Frac.} \\
+\midrule
+Invisible    & 1,372 & 65.7\% \\
+Negligible   & 84    & 4.0\% \\
+Weak         & 301   & 14.4\% \\
+Moderate     & 227   & 10.9\% \\
+Near-excl.   & 58    & 2.8\% \\
+Excluded     & 45    & 2.2\% \\
+\bottomrule
+\end{tabular}
+\vspace{0.5em}
+
+{\small \textbf{Caveat:} SModelS v3.1.1 missing three key ATLAS analyses --- true invisible fraction is lower.}
+\backuplink{backup:coverage}{Coverage details}
+\end{columns}
+\end{frame}
+
+% ----- 7. Mass planes ------------------------------------
+\begin{frame}{Mass Plane Scatter Plots}
+\begin{columns}[T]
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{massplane_ewkino}\\[-0.3em]
+{\tiny EWKino plane}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{massplane_slepton}\\[-0.3em]
+{\tiny Slepton plane}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{massplane_stop}\\[-0.3em]
+{\tiny Stop plane}
+\end{center}
+\end{columns}
+\vspace{0.3em}
+{\small Many ``invisible'' models lie within published ATLAS contours --- the gap is primarily in SModelS topology encoding, not ATLAS sensitivity.}
+\backuplink{backup:massplanes}{Individual mass planes}
+\end{frame}
+
+% ============================================================
+\section{ATLAS Blind Spots}
+% ============================================================
+
+% ----- 8. Five blind spots overview -----------------------
+\begin{frame}{Five ATLAS Blind Spots}
+\begin{center}
+\small
+\begin{tabular}{clrcccc}
+\toprule
+\textbf{Gap} & \textbf{Description} & \textbf{Models} & \textbf{Signal} & \textbf{Excl.} & \textbf{Disc.} & \textbf{Priority} \\
+\midrule
+A & Compressed Wino    & 520 & Disapp.\ tracks + \MET & 102 & 72 & \textcolor{red}{\textbf{HIGH}} \\
+B & Compressed Higgsino & 737 & Soft dileptons + \MET  & 42  & 19 & \textcolor{red}{\textbf{HIGH}} \\
+C & Light sleptons     & 509 & Dilepton + \MET        & 165 & 128 & \textcolor{orange}{\textbf{MED}} \\
+D & Compressed stop    & 2   & $b$-jet + displ.\ vtx  & 2   & 2  & \textcolor{orange}{\textbf{MED}} \\
+E & Complex EWKino     & 80  & Multi-lepton + \MET    & 22  & 13 & \textcolor{blue}{\textbf{LOW}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.3em}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item 1,456 models (69.7\%) at tier 0--1 (invisible/negligible)
+  \item ``Excl.'' = $N_\text{sig}>3$, ``Disc.'' = $N_\text{sig}>10$ at 300\,fb$^{-1}$
+  \item \textbf{15 truly dark} models: invisible to both ATLAS and DARWIN
+  \item 66 models with $\ctau(\chipm) > 1$\,cm (disappearing track candidates)
+\end{itemize}
+\end{frame}
+
+% ----- 9. Gap A: Compressed Wino --------------------------
+\begin{frame}{Gap A: Compressed Wino (520 models)}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{gap_A_xsec_vs_mass}
+\column{0.48\textwidth}
+\plothalf{gap_A_signal_yields}
+\end{columns}
+\vspace{-0.5em}
+{\footnotesize
+\begin{itemize}\setlength\itemsep{0pt}
+  \item All Wino LSP, median $\Delta m = 1.9\GeV$. Signal: $\chipm\chioz + \text{ISR}$, $\chipm \to \pi^\pm\chioz$ (displaced)
+  \item 534 below ATLAS-SUSY-2018-19 limit ($\sim$660\GeV) but SModelS lacks topology
+  \item Run~3 ITk $\to$ 800+\GeV; 102 excludable, 72 discoverable
+\end{itemize}}
+\backuplink{backup:gapA}{Gap A details}
+\end{frame}
+
+% ----- 10. Gap B: Compressed Higgsino --------------------
+\begin{frame}{Gap B: Compressed Higgsino (737 models)}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{gap_B_xsec_vs_mass}
+\column{0.48\textwidth}
+\plothalf{gap_B_signal_yields}
+\end{columns}
+\vspace{-0.5em}
+{\footnotesize
+\begin{itemize}\setlength\itemsep{0pt}
+  \item All Higgsino LSP, median $\Delta m = 3.1\GeV$. Signal: $\chitwo\chipm + \text{ISR}$, soft dileptons
+  \item \mll binning down to 1\GeV targets compressed spectrum
+  \item Improved low-$p_\text{T}$ $e$ reco from ITk; 42 excludable, 19 discoverable
+\end{itemize}}
+\backuplink{backup:gapB}{Gap B details}
+\end{frame}
+
+% ----- 11. Gaps C, D, E combined --------------------------
+\begin{frame}{Gaps C / D / E: Sleptons, Stops, Complex EWKino}
+\begin{columns}[T]
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_C_signal_yields}\\[-0.3em]
+{\tiny Gap C: Light sleptons (509)}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_D_signal_yields}\\[-0.3em]
+{\tiny Gap D: Compr.\ stop (2)}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_E_signal_yields}\\[-0.3em]
+{\tiny Gap E: Complex EWKino (80)}
+\end{center}
+\end{columns}
+\vspace{0.2em}
+{\small
+\begin{itemize}\setlength\itemsep{0pt}
+  \item \textbf{C:} 21 Bino+slepton models invisible despite ATLAS reach $\sim$700\GeV --- pMSSM BR dilution
+  \item \textbf{D:} Only 2 models but $\sigma$ up to \textbf{14\pb}; long-lived \chipm falls between prompt \& displaced
+  \item \textbf{E:} Multi-body cascades; extend multi-lepton searches with asymmetric SRs
+\end{itemize}}
+\backuplink{backup:gapCDE}{Gap C/D/E details}
+\end{frame}
+
+% ----- 12. Unexpected findings ----------------------------
+\begin{frame}{Three Unexpected Blind Spots}
+\small
+\begin{enumerate}
+  \item \textbf{Light sleptons with Bino LSP (21 models):}
+    Sleptons at 270--580\GeV invisible despite ATLAS reach $\sim$700\GeV.
+    pMSSM BRs dilute the clean dilepton signal; SModelS lacks this topology.
+
+  \item \textbf{Compressed stops with displaced charginos (2 models, up to 14\pb):}
+    Stops within T2tt contour but Wino LSP creates long-lived $\chipm$ ($\ctau \sim 1$--10\,cm).
+    Falls between prompt and displaced searches --- a \textbf{novel gap}.
+
+  \item \textbf{534 Wino models below disappearing-track limit:}
+    ATLAS-SUSY-2018-19 excludes pure Winos to $\sim$660\GeV, but all invisible in SModelS.
+    Encoding this \textbf{single analysis} would reclassify most ``invisible'' models.
+\end{enumerate}
+\vspace{0.3em}
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\centering
+Models at masses and $\sigma$ where simplified-model results predict exclusion --- the pMSSM reveals the gap.
+}}
+\end{center}
+\end{frame}
+
+% ============================================================
+\section{Complementarity \& Recommendations}
+% ============================================================
+
+% ----- 13. Direct detection + Run 3 reach -----------------
+\begin{frame}{Direct Detection \& Run 3 Reach}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{center}
+\plotthird{dd_complementarity}
+\end{center}
+\vspace{-0.5em}
+{\footnotesize SI $\sigma_p$ vs $m_\text{LSP}$.
+\textbf{15 models} below DARWIN sensitivity AND invisible to ATLAS --- can only be probed at LHC with dedicated searches.}
+\column{0.48\textwidth}
+\begin{center}
+\plotthird{run3_reach_summary}
+\end{center}
+\vspace{-0.5em}
+{\footnotesize Run~3 reach at 300\,fb$^{-1}$ across the five gaps.
+Combined: 333 excludable, 234 discoverable.}
+\end{columns}
+\backuplink{backup:benchmarks}{Benchmark models}
+\end{frame}
+
+% ----- 14. Recommendations --------------------------------
+\begin{frame}{Recommendations for ATLAS}
+\begin{enumerate}
+  \item \textbf{Encode existing searches in SModelS} (highest impact):\\
+    {\small Add SUSY-2018-19 (disapp.\ tracks), SUSY-2018-32 (sleptons), SUSY-2019-09 (compressed Higgsino).
+    Would reclassify the majority of 1,372 ``invisible'' models.}
+
+  \item \textbf{Extend disappearing-track search (Gap A):}\\
+    {\small Reach $\sim$460 $\to$ 800+\GeV with ITk. 102 models excludable.}
+
+  \item \textbf{Lower soft-lepton thresholds (Gap B):}\\
+    {\small ISR-boosted with \mll binning to 1\GeV. 42 models excludable.}
+
+  \item \textbf{Extend slepton reach (Gap C):}\\
+    {\small \mTtwo-based to 400--500\GeV. 165 models excludable.}
+
+  \item \textbf{Novel displaced $b$-jet search (Gap D):}\\
+    {\small Displaced vertex + $b$-tagging. $\sigma$ up to 14\pb.}
+
+  \item \textbf{Multi-lepton cascade search (Gap E):}\\
+    {\small Asymmetric final-state SRs. 22 models excludable.}
+\end{enumerate}
+\end{frame}
+
+% ----- 15. Summary ----------------------------------------
+\begin{frame}{Summary}
+\begin{itemize}
+  \item \textbf{2,087 pMSSM models} survive all current constraints (from 26,048 evaluated)
+  \item Viable pMSSM dominated by \textbf{compressed electroweakino spectra}: Wino 48\%, Higgsino 48\%, Bino 4\%
+  \item \textbf{69.7\% invisible to ATLAS} in SModelS --- but much of this is a SModelS encoding gap
+  \item \textbf{Five blind spots} identified with concrete Run~3 search proposals and 30 benchmarks
+  \item \textbf{15 truly dark models} invisible to both ATLAS and direct detection (DARWIN)
+  \item Narrow corridors (Bino co-annihilation, compressed stop) intrinsically difficult --- importance sampling is the best tool
+  \item \textbf{Highest-impact action:} Encode 3 missing ATLAS analyses in SModelS
+\end{itemize}
+
+\vspace{0.5em}
+\begin{center}
+{\small Full code, spectra, and analysis: \url{https://github.com/jwuerzinger/SUSY_agent}}\\[0.8em]
+\large\textbf{Backup slides follow}
+\end{center}
+\end{frame}
+
+% ============================================================
+\appendix
+\section*{Backup}
+% ============================================================
+
+% ----- Pipeline details -----------------------------------
+\begin{frame}[label=backup:pipeline]{Backup: Physics Pipeline}
+\begin{center}
+\Large
+\textbf{Input SLHA} $\;\to\;$ \textbf{SPheno} $\;\to\;$ \textbf{Softsusy}\\[0.6em]
+$\to\;$ \textbf{micrOMEGAs} $\;\to\;$ \textbf{SuperISO} $\;\to\;$ \textbf{GM2Calc}\\[0.6em]
+$\to\;$ \textbf{FeynHiggs} $\;\to\;$ \textbf{SModelS\,3.1.1}\\[0.6em]
+$\to\;$ \textbf{ROOT Ntuple}
+\end{center}
+\vspace{0.5em}
+\begin{itemize}
+  \item Dual spectrum generators (SPheno + Softsusy) for cross-validation
+  \item Full dark matter, flavour, $(g-2)_\mu$, Higgs mass calculation
+  \item SModelS v3.1.1 reinterpretation against all published ATLAS/CMS simplified-model limits
+  \item 1,131 branches per model in output ntuples
+\end{itemize}
+\end{frame}
+
+% ----- Cut details ----------------------------------------
+\begin{frame}[label=backup:cuts]{Backup: Experimental Constraints}
+\begin{center}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Cut} & \textbf{Criterion} & \textbf{Rejection} & \textbf{Source} \\
+\midrule
+Quality    & SP + SS converge, \chioz\ LSP & $\sim$40\% & Spectrum \\
+Higgs mass & $122 < \mh < 128\GeV$ & $\sim$50\% & FeynHiggs/SPheno \\
+Relic density & $\Omegah \leq 0.132$ & $\sim$20\% & micrOMEGAs \\
+B-physics  & BR($b\!\to\!s\gamma$), BR($B_s\!\to\!\mu\mu$) $2\sigma$ & $\sim$15\% & SuperISO \\
+LHC exclusion & SModelS $r < 1$ & $\sim$2\% & SModelS \\
+LEP chargino & $m(\chipm) > 103\GeV$ & $<$1\% & Direct \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.5em}
+\begin{itemize}
+  \item B-physics is the harshest discriminant after the Higgs mass
+  \item LHC limits have surprisingly limited impact on the pMSSM --- only $\sim$2\% excluded
+\end{itemize}
+\end{frame}
+
+% ----- Phase breakdown ------------------------------------
+\begin{frame}[label=backup:phases]{Backup: Phase-by-Phase Results}
+\begin{center}
+\small
+\begin{tabular}{lrcrr}
+\toprule
+\textbf{Phase} & \textbf{Strategy} & \textbf{Target} & \textbf{Evaluated} & \textbf{Passing} \\
+\midrule
+1 (flat)           & Uniform random    &                   & 2,000  & 5 \\
+2a (EWKino)        & MCMC targeted     & EWKino            & 1,503  & 163 \\
+2b (Stop)          & MCMC targeted     & Stop              & 1,503  & 134 \\
+2c (Slepton)       & MCMC targeted     & Slepton           & 2,004  & 71 \\
+2d (Compressed)    & MCMC targeted     & Compressed        & 2,004  & 83 \\
+3a--c              & MCMC refinements  &                   & 4,509  & 2 \\
+4a (Wino)          & MCMC targeted     & Pure Wino         & 987    & 698 \\
+4b (Higgsino)      & MCMC targeted     & Soft Higgsino     & 916    & 532 \\
+4c (Slep+Bino)     & MCMC + grid       & Co-annihilation   & 2,895  & 0 \\
+4d (Compr.\ stop)  & MCMC + grid       & Stop corridor     & 1,376  & 0 \\
+4e (Mixed EWK)     & MCMC targeted     & Complex cascades  & 952    & 375 \\
+5a (Bino imp.)     & Importance samp.  & Bino seeds        & 1,860  & 24 \\
+5b (Stop imp.)     & Importance samp.  & Stop seeds        & 2,940  & 0 \\
+\midrule
+\textbf{Total}     &                   &                   & \textbf{26,048} & \textbf{2,087} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{frame}
+
+% ----- Importance sampling details -------------------------
+\begin{frame}[label=backup:importance]{Backup: Importance Sampling (Phase 5)}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Phase 5a: Bino co-annihilation}
+\begin{itemize}
+  \item 62 Bino seeds $\times$ 10 perturbations $\times$ 3 random seeds
+  \item 1,860 points $\to$ \textbf{24 pass (1.3\%)}
+  \item Recovers models in the narrow slepton--Bino corridor ($\Delta m \sim 10$--20\GeV)
+\end{itemize}
+
+\column{0.48\textwidth}
+\textbf{Phase 5b: Compressed stop}
+\begin{itemize}
+  \item 14 stop seeds $\times$ 70 perturbations $\times$ 3 random seeds
+  \item 2,940 points $\to$ \textbf{0 pass}
+  \item All points tachyonic at SPheno --- corridor is inaccessible
+\end{itemize}
+\end{columns}
+
+\vspace{1em}
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering
+Narrow corridors ($\mathcal{O}(10\GeV)$ wide) defeat flat, MCMC, grid, and importance sampling.\\
+The compressed-stop mixing line remains sparsely sampled (7 models total).
+}}
+\end{center}
+\end{frame}
+
+% ----- Categories plot ------------------------------------
+\begin{frame}[label=backup:categories]{Backup: Physics Categories}
+\begin{center}
+\plotfull{final_categories}
+\end{center}
+\vspace{-0.5em}
+{\small 99.5\% of models have $\Delta m(\chipm, \text{LSP}) < 50\GeV$ --- compressed spectra dominate the viable pMSSM.}
+\end{frame}
+
+% ----- ATLAS coverage details ------------------------------
+\begin{frame}[label=backup:coverage]{Backup: ATLAS vs CMS \& Missing Topologies}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{center}
+\plotthird{atlas_vs_cms}\\[-0.3em]
+{\tiny ATLAS vs CMS: similar coverage}
+\end{center}
+\column{0.48\textwidth}
+\begin{center}
+\plotthird{missing_topologies_bar}\\[-0.3em]
+{\tiny Missing topologies in SModelS}
+\end{center}
+\end{columns}
+\vspace{0.3em}
+{\small Disappearing-track, slepton pair, and compressed Higgsino topologies absent from SModelS database. Encoding these would reclassify the majority of ``invisible'' models.}
+\end{frame}
+
+% ----- Coverage heatmap -----------------------------------
+\begin{frame}[label=backup:heatmap]{Backup: Coverage Heatmap}
+\begin{center}
+\plotfull{coverage_heatmap}
+\end{center}
+\end{frame}
+
+% ----- Individual mass planes -----------------------------
+\begin{frame}[label=backup:massplanes]{Backup: Individual Mass Planes}
+\begin{columns}[T]
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{massplane_ewkino}\\[-0.3em]
+{\tiny EWKino: many models within\\ATLAS contours}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{massplane_slepton}\\[-0.3em]
+{\tiny Slepton: 21 Bino models\\invisible despite reach}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{massplane_stop}\\[-0.3em]
+{\tiny Stop: 268--337\GeV escape\\via displaced \chipm}
+\end{center}
+\end{columns}
+\end{frame}
+
+% ----- Gap A details --------------------------------------
+\begin{frame}[label=backup:gapA]{Backup: Gap A --- Compressed Wino Details}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{gap_A_mass_splitting_dist}
+\column{0.48\textwidth}
+\plothalf{gap_A_kinematic_reach}
+\end{columns}
+\vspace{0.3em}
+{\small 520 Wino models, $m(\text{LSP})$: 103--890\GeV. Median $\Delta m(\chipm, \chioz) = 1.9\GeV$.
+Signal: $pp \to \chipm\chioz + \text{ISR}$, $\chipm \to \pi^\pm \chioz$ (displaced).
+Run~3 ITk pixel reach extends to $|\eta| < 4$ with dedicated disappearing-track trigger.}
+\end{frame}
+
+% ----- Gap B details --------------------------------------
+\begin{frame}[label=backup:gapB]{Backup: Gap B --- Compressed Higgsino Details}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{gap_B_mass_splitting_dist}
+\column{0.48\textwidth}
+\plothalf{gap_B_kinematic_reach}
+\end{columns}
+\vspace{0.3em}
+{\small 737 Higgsino models, $m(\text{LSP})$: 94--675\GeV. Median $\Delta m = 3.1\GeV$.
+Signal: $pp \to \chitwo\chipm + \text{ISR}$, soft dileptons. \mll binning: [1--3], [3--5], [5--10], [10--20], [20--40]\GeV.
+Ref: ATLAS-SUSY-2019-09.}
+\end{frame}
+
+% ----- Gap C/D/E details ---------------------------------
+\begin{frame}[label=backup:gapCDE]{Backup: Gaps C, D, E --- Details}
+\begin{columns}[T]
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_C_xsec_vs_mass}\\[-0.3em]
+{\tiny Gap C: $\sigma$ vs mass}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_D_xsec_vs_mass}\\[-0.3em]
+{\tiny Gap D: $\sigma$ up to 14\pb}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_E_xsec_vs_mass}\\[-0.3em]
+{\tiny Gap E: $\sigma$ vs mass}
+\end{center}
+\end{columns}
+\vspace{0.3em}
+{\small
+\textbf{C:} 509 models (Bino 44, Wino 245, Higgs.\ 220). \mTtwo-based search to 400--500\GeV. 165 excludable.\\
+\textbf{D:} 2 models, stops at 268/337\GeV. $b$-jet + displaced vertex. Novel signature.\\
+\textbf{E:} 80 models. Multi-body cascades $W/Z/h$ + \MET. Asymmetric final-state SRs. 22 excludable.
+}
+\end{frame}
+
+% ----- Gap kinematic reach --------------------------------
+\begin{frame}{Backup: Kinematic Reach (Gaps C, D, E)}
+\begin{columns}[T]
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_C_kinematic_reach}\\[-0.3em]
+{\tiny Gap C}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_D_kinematic_reach}\\[-0.3em]
+{\tiny Gap D}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_E_kinematic_reach}\\[-0.3em]
+{\tiny Gap E}
+\end{center}
+\end{columns}
+\end{frame}
+
+% ----- Gap mass splitting distributions -------------------
+\begin{frame}{Backup: Mass Splitting Distributions (Gaps C, D, E)}
+\begin{columns}[T]
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_C_mass_splitting_dist}\\[-0.3em]
+{\tiny Gap C}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_D_mass_splitting_dist}\\[-0.3em]
+{\tiny Gap D}
+\end{center}
+\column{0.32\textwidth}
+\begin{center}
+\plotthird{gap_E_mass_splitting_dist}\\[-0.3em]
+{\tiny Gap E}
+\end{center}
+\end{columns}
+\end{frame}
+
+% ----- Benchmarks -----------------------------------------
+\begin{frame}[label=backup:benchmarks]{Backup: Benchmark Models}
+\begin{center}
+\plotfull{benchmark_mass_grid}
+\end{center}
+\vspace{-0.5em}
+{\small 30 benchmark SLHA spectra across all 5 gaps (7+7+7+2+7), spanning the full mass range. Available for MC production.}
+\end{frame}
+
+% ----- Displaced signatures --------------------------------
+\begin{frame}{Backup: Displaced Cross-Section Distribution}
+\begin{center}
+\plotfull{displaced_xsec_dist}
+\end{center}
+\vspace{-0.5em}
+{\small Production $\sigma$ for models with displaced signatures ($\ctau > 1$\,cm). 66 disappearing-track candidates.}
+\end{frame}
+
+% ----- Phase 1 diagnostics --------------------------------
+\begin{frame}{Backup: Phase 1 --- Higgs Mass \& Relic Density}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{phase1_higgs_mass}
+\column{0.48\textwidth}
+\plothalf{phase1_relic_density}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: Phase 1 --- LSP Composition \& Parameter Space}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{phase1_lsp_composition}
+\column{0.48\textwidth}
+\plothalf{phase1_M1_vs_M2}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: Phase 1 --- $M_1$ vs $\mu$ and $m_A$ vs $\tan\beta$}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{phase1_M1_vs_mu}
+\column{0.48\textwidth}
+\plothalf{phase1_mA_vs_tanb}
+\end{columns}
+\end{frame}
+
+% ----- Phase 2 diagnostics --------------------------------
+\begin{frame}{Backup: Phase 2 --- LSP Mass \& Composition}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{phase2_lsp_mass}
+\column{0.48\textwidth}
+\plothalf{phase2_lsp_composition}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: Phase 2 --- Relic Density \& Categories}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{phase2_relic_density}
+\column{0.48\textwidth}
+\plothalf{phase2_categories}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: Phase 2 --- Chargino $\Delta m$ \& Stop vs LSP}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\plothalf{phase2_dm_chargino}
+\column{0.48\textwidth}
+\plothalf{phase2_stop_vs_lsp}
+\end{columns}
+\end{frame}
+
+\end{document}
